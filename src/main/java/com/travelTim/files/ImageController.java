@@ -29,7 +29,7 @@ public class ImageController {
     public ResponseEntity<?> uploadProfileImage(
             @RequestParam(value = "image") Optional<MultipartFile> image) {
         Long userId = this.userService.findLoggedInUser().getId();
-        this.imageService.uploadImage(userId, image, ImageType.USER);
+        this.imageService.uploadUserImage(userId, image);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -49,32 +49,40 @@ public class ImageController {
     }
 
     @PostMapping(path = "/business/{businessId}")
-    public ResponseEntity<?> addBusinessImage(
-            @RequestParam(value = "image") Optional<MultipartFile> image,
+    public ResponseEntity<?> uploadBusinessImages(
+            @RequestParam(value = "images") Optional<List<MultipartFile>> images,
             @PathVariable("businessId") Long businessId) {
-        this.imageService.uploadImage(businessId, image, ImageType.BUSINESS);
+        this.imageService.uploadBusinessImages(businessId, images);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping(path = "/business/{businessId}")
+    @GetMapping(path = "/business/{businessId}/front")
     @CrossOrigin
-    public ResponseEntity<String> getBusinessImage(
+    public ResponseEntity<String> getBusinessFrontImage(
             @PathVariable("businessId") Long businessId){
-        String businessImage = this.imageService.getBusinessImage(businessId);
+        String businessImage = this.imageService.getBusinessFrontImage(businessId);
         return new ResponseEntity<>(businessImage, HttpStatus.OK);
     }
 
-    @GetMapping (path = "/business/{businessId}/name")
-    @ResponseBody
-    public String getBusinessImagePath(@PathVariable("businessId") Long businessId){
-        return imageService.getImagePath(businessId, ImageType.BUSINESS);
+    @GetMapping(path = "/business/{businessId}/all")
+    @CrossOrigin
+    public ResponseEntity<List<String>> getBusinessImages(
+            @PathVariable("businessId") Long businessId){
+        List<String> businessImages = this.imageService.getBusinessImages(businessId);
+        return new ResponseEntity<>(businessImages, HttpStatus.OK);
+    }
+
+    @GetMapping (path = "/business/{businessId}/all/names")
+    public ResponseEntity<List<String>> getBusinessImagesNames(@PathVariable("businessId") Long businessId){
+        List<String> businessImagesNames = imageService.getBusinessImagesNames(businessId);
+        return new ResponseEntity<>(businessImagesNames, HttpStatus.OK);
     }
 
     @PostMapping(path = "/offer/{offerId}")
     public ResponseEntity<?> addOfferImages(
             @PathVariable("offerId") Long offerId,
             @RequestParam(value = "offerType") String offerType,
-            @RequestParam(value = "images") List<MultipartFile> images) throws IOException {
+            @RequestParam(value = "images") List<MultipartFile> images) {
         this.imageService.uploadOfferImages(offerId, images, offerType);
         return new ResponseEntity<>(HttpStatus.OK);
     }

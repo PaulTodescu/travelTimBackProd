@@ -78,7 +78,7 @@ public class CategoryService {
                 offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRate));
             }
             if (offer.getBusiness() != null) { // offer is of legal type
-                offer.setImage(this.imageService.getBusinessImage(offer.getBusiness().getId()));
+                offer.setImage(this.imageService.getBusinessImages(offer.getBusiness().getId()).get(0));
                 // for offers which have a business
                 //      - set creation date to the date of the latest offer in that business
                 //      - set price to the cheapest offer (conversion between eur and ron is also handled)
@@ -111,7 +111,7 @@ public class CategoryService {
                 offer.setPrice(cheapestOfferPrice);
 
             } else { // offer is of physical type
-                offer.setImage(this.imageService.getOfferImage("lodging", offer.getId()));
+                offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));
             }
         }
         return offers;
@@ -122,7 +122,7 @@ public class CategoryService {
         FoodDTOMapper mapper = new FoodDTOMapper();
         Set<FoodOfferDTO> offers = mapper.mapFoodOffersToDTOs(category.getFoodOffers());
         for (FoodOfferDTO offer: offers){
-            offer.setImage(this.imageService.getBusinessImage(offer.getBusiness().getId()));
+            offer.setImage(this.imageService.getBusinessFrontImage(offer.getBusiness().getId()));
         }
         return offers;
     }
@@ -132,7 +132,7 @@ public class CategoryService {
         AttractionDTOMapper mapper = new AttractionDTOMapper();
         Set<AttractionOfferDTO> offers = mapper.mapAttractionOffersToDTOs(category.getAttractionOffers());
         for (AttractionOfferDTO offer: offers){
-            offer.setImage(this.imageService.getOfferImage("attractions", offer.getId()));
+            offer.setImage(this.imageService.getOfferFrontImage("attractions", offer.getId()));
         }
         return offers;
     }
@@ -142,7 +142,7 @@ public class CategoryService {
         ActivityDTOMapper mapper = new ActivityDTOMapper();
         Set<ActivityOfferDTO> offers = mapper.mapActivityOffersToDTOs(category.getActivityOffers());
         for (ActivityOfferDTO offer: offers){
-            offer.setImage(this.imageService.getOfferImage("activities", offer.getId()));
+            offer.setImage(this.imageService.getOfferFrontImage("activities", offer.getId()));
         }
         return offers;
     }

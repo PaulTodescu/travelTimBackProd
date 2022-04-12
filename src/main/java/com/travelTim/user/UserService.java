@@ -6,6 +6,7 @@ import com.travelTim.attractions.AttractionOfferEntity;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.files.ImageService;
 import com.travelTim.files.ImageType;
+import com.travelTim.files.ImageUtils;
 import com.travelTim.food.FoodOfferEntity;
 import com.travelTim.lodging.LodgingOfferEntity;
 import org.modelmapper.ModelMapper;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
@@ -29,11 +29,14 @@ public class UserService {
 
     private final UserDAO userDAO;
     private final ImageService imageService;
+    private final ImageUtils imageUtils;
+
 
     @Autowired
-    public UserService(UserDAO userDAO, ImageService imageService) {
+    public UserService(UserDAO userDAO, ImageService imageService, ImageUtils imageUtils) {
         this.userDAO = userDAO;
         this.imageService = imageService;
+        this.imageUtils = imageUtils;
     }
 
     public void addUser(UserEntity user) {
@@ -44,7 +47,7 @@ public class UserService {
         }
 
         UserEntity savedUser = this.userDAO.save(user);
-        this.imageService.uploadImage(savedUser.getId(), Optional.empty(), ImageType.USER);
+        this.imageService.uploadUserImage(savedUser.getId(), Optional.empty());
     }
 
     public UserEntity findUserById(Long id){
@@ -128,7 +131,7 @@ public class UserService {
     public void deleteUser() {
         UserEntity loggedInUser = this.findLoggedInUser();
         this.userDAO.deleteUserEntityById(loggedInUser.getId());
-        this.imageService.deleteImage(loggedInUser.getId(), ImageType.USER);
+        this.imageUtils.deleteImage(loggedInUser.getId(), ImageType.USER);
     }
 
     public List<BusinessEntity> getAllBusinessesForCurrentUser() {

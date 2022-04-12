@@ -22,20 +22,21 @@ import java.util.*;
 public class ImageService {
 
     private final ServletContext context;
+    private final ImageUtils imageUtils;
 
     @Autowired
-    public ImageService(ServletContext context) {
+    public ImageService(ServletContext context, ImageUtils imageUtils) {
         this.context = context;
+        this.imageUtils = imageUtils;
     }
 
-    public void uploadImage(Long id, Optional<MultipartFile> image, ImageType imageType) {
-
-        String uploadPath = this.getUploadPath(imageType, id);
+    public void uploadUserImage(Long id, Optional<MultipartFile> image) {
+        String uploadPath = this.imageUtils.getUploadPath(ImageType.USER, id);
         if (uploadPath == null){
             return;
         }
 
-        File directory = this.createImageDirectory(uploadPath);
+        File directory = this.imageUtils.createImageDirectory(uploadPath);
         if (directory == null){
             return;
         }
@@ -55,23 +56,57 @@ public class ImageService {
                 throw new RuntimeException("Could not store file " + imageFile.getOriginalFilename());
             }
         } else {
-            uploadDefaultImage(id, imageType);
+            this.uploadDefaultImage(id, ImageType.USER);
         }
     }
 
-    public void uploadDefaultImage(Long id, ImageType imageType) { // triggered when user registers
-
-        String uploadPath = this.getUploadPath(imageType, id);
+    public void uploadBusinessImages(Long businessId, Optional<List<MultipartFile>> images) {
+        String uploadPath = this.imageUtils.getUploadPath(ImageType.BUSINESS, businessId);
         if (uploadPath == null){
             return;
         }
 
-        File directory = this.createImageDirectory(uploadPath);
+        File directory = this.imageUtils.createImageDirectory(uploadPath);
         if (directory == null){
             return;
         }
 
-        String defaultImagePath = getDefaultImagePath(imageType);
+        int nrFiles = Objects.requireNonNull(directory.list()).length;
+        if (nrFiles != 0) {
+            try {
+                FileUtils.cleanDirectory(directory);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        if (images.isPresent()) {
+            for (MultipartFile image : images.get()) {
+                try {
+                    Path copyLocation = Paths
+                            .get(uploadPath + File.separator + StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename())));
+                    Files.copy(image.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("Could not store file " + image.getOriginalFilename());
+                }
+            }
+        } else {
+            this.uploadDefaultImage(businessId, ImageType.BUSINESS);
+        }
+    }
+
+    public void uploadDefaultImage(Long id, ImageType imageType) {
+        String uploadPath = this.imageUtils.getUploadPath(imageType, id);
+        if (uploadPath == null){
+            return;
+        }
+
+        File directory = this.imageUtils.createImageDirectory(uploadPath);
+        if (directory == null){
+            return;
+        }
+
+        String defaultImagePath = this.imageUtils.getDefaultImagePath(imageType);
 
         try {
             InputStream defaultImage = new FileInputStream(context.getRealPath(defaultImagePath));
@@ -84,20 +119,24 @@ public class ImageService {
         }
     }
 
-    public void uploadOfferImages(Long offerId, List<MultipartFile> offerImages, String offerType) throws IOException {
-        String uploadPath = this.getOfferUploadPath(offerType, offerId);
+    public void uploadOfferImages(Long offerId, List<MultipartFile> offerImages, String offerType) {
+        String uploadPath = this.imageUtils.getOfferUploadPath(offerType, offerId);
         if (uploadPath == null){
             return;
         }
 
-        File directory = this.createImageDirectory(uploadPath);
+        File directory = this.imageUtils.createImageDirectory(uploadPath);
         if (directory == null){
             return;
         }
 
         int nrFiles = Objects.requireNonNull(directory.list()).length;
         if (nrFiles != 0) {
-            FileUtils.cleanDirectory(directory);
+            try {
+                FileUtils.cleanDirectory(directory);
+            } catch (IOException e){
+                e.printStackTrace();
+            }
         }
 
         for (MultipartFile image: offerImages) {
@@ -112,139 +151,48 @@ public class ImageService {
         }
     }
 
-    private String getUploadPath(ImageType imageType, Long id){
-        String uploadPath = null;
-        switch (imageType){
-            case USER:
-                uploadPath = context.getRealPath("/images/user/" + id);
-                break;
-            case BUSINESS:
-                uploadPath = context.getRealPath("/images/business/" + id);
-                break;
-        }
-        return uploadPath;
-    }
-
-    private String getOfferUploadPath(String offerType, Long offerId){
-        String basePath = "/images/offer";
-        String uploadPath;
-        switch (offerType){
-            case "lodging":
-                uploadPath = context.getRealPath(basePath + "/lodging/" + offerId);
-                break;
-            case "food":
-                uploadPath = context.getRealPath(basePath + "/food/" + offerId);
-                break;
-            case "attractions":
-                uploadPath = context.getRealPath(basePath + "/attractions/" + offerId);
-                break;
-            case "activities":
-                uploadPath = context.getRealPath(basePath + "/activities/" + offerId);
-                break;
-            default:
-                return null;
-        }
-        return uploadPath;
-    }
-
-    public String getDefaultImagePath(ImageType imageType){
-        switch (imageType){
-            case USER:
-                return "/images/user/default.png";
-            case BUSINESS:
-                return "/images/business/default.png";
-            default:
-                return null;
-        }
-    }
-
-    private File createImageDirectory(String uploadPath) {
-        File directory = new File(uploadPath);
-        if(!directory.exists()) {
-            if (!directory.mkdirs())
-                return null;
-        }
-        return directory;
-    }
-
     public String getUserImage(Long userId){
-        String imagePath = this.getUploadPath(ImageType.USER, userId);
+        String imagePath = this.imageUtils.getUploadPath(ImageType.USER, userId);
         if (imagePath == null){
             return null;
         }
-        return this.getImage(imagePath);
+        return this.imageUtils.getImage(imagePath);
     }
 
-    public String getBusinessImage(Long businessId){
-        String imagePath = this.getUploadPath(ImageType.BUSINESS, businessId);
-        if (imagePath == null){
-            return null;
-        }
-        return this.getImage(imagePath);
+    public List<String> getBusinessImages(Long businessId){
+        String path = this.imageUtils.getUploadPath(ImageType.BUSINESS, businessId);
+        return this.imageUtils.getImages(path);
     }
 
-    public String getOfferImage(String offerType, Long offerId){
-        String imagesPath = this.getOfferUploadPath(offerType, offerId);
-        return this.getImage(imagesPath);
+    public String getBusinessFrontImage(Long businessId){
+        return this.getBusinessImages(businessId).get(0);
     }
 
-    public String getImage(String imagePath) {
-        String image = null;
-        File imageDirectory = new File(imagePath);
-        File[] imageDirectoryContent = imageDirectory.listFiles();
-        if (imageDirectoryContent != null){
-            File imageFile = imageDirectoryContent[0];
-            String encodeBase64;
-            try {
-                String extension = FilenameUtils.getExtension(imageFile.getName());
-                FileInputStream fileInputStream = new FileInputStream(imageFile);
-                byte [] bytes = new byte[(int) imageFile.length()];
-                fileInputStream.read(bytes);
-                encodeBase64 = Base64.getEncoder().encodeToString(bytes);
-                image = "data:image/" + extension + ";base64," + encodeBase64;
-                fileInputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+    public List<String> getBusinessImagesNames(Long businessId){
+        String path = this.imageUtils.getUploadPath(ImageType.BUSINESS, businessId);
+        File imageDirectory = new File(path);
+        List<String> imageNames = new ArrayList<>();
+        File[] images = imageDirectory.listFiles();
+        if (images != null) {
+            for(File image: images){
+                imageNames.add(image.getName());
             }
         }
-        return image;
+        return imageNames;
     }
 
     public List<String> getOfferImages(String offerType, Long offerId){
-        String imagePath = this.getOfferUploadPath(offerType, offerId);
-        if (imagePath == null){
-            return null;
-        }
+        String path = this.imageUtils.getOfferUploadPath(offerType, offerId);
+        return this.imageUtils.getImages(path);
+    }
 
-        List<String> offerImages = new ArrayList<>();
-        File imageDirectory = new File(imagePath);
-        File[] imageDirectoryContent = imageDirectory.listFiles();
 
-        if (imageDirectoryContent != null){
-            for (File imageFile: imageDirectoryContent){
-                String encodeBase64;
-                String image;
-                try {
-                    String extension = FilenameUtils.getExtension(imageFile.getName());
-                    FileInputStream fileInputStream = new FileInputStream(imageFile);
-                    byte [] bytes = new byte[(int) imageFile.length()];
-                    fileInputStream.read(bytes);
-                    encodeBase64 = Base64.getEncoder().encodeToString(bytes);
-                    image = "data:image/" + extension + ";base64," + encodeBase64;
-                    offerImages.add(image);
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-        return offerImages;
-
+    public String getOfferFrontImage(String offerType, Long offerId){
+        return this.getOfferImages(offerType, offerId).get(0);
     }
 
     public String getImagePath(Long id, ImageType imageType) {
-        String imagePath = this.getUploadPath(imageType, id);
+        String imagePath = this.imageUtils.getUploadPath(imageType, id);
         if (imagePath == null){
             return null;
         }
@@ -259,37 +207,4 @@ public class ImageService {
         return null;
     }
 
-
-
-    public void deleteImage(Long id, ImageType imageType){
-        String imagePath = this.getUploadPath(imageType, id);
-        if (imagePath == null){
-            return;
-        }
-        File directory = new File(imagePath);
-        if (directory.exists()){
-            try {
-                FileUtils.deleteDirectory(directory);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void deleteOfferImages(String offerType, Long offerId) {
-        String imagesPath = this.getOfferUploadPath(offerType, offerId);
-        if (imagesPath == null){
-            return;
-        }
-
-        File directory = new File(imagesPath);
-        if (directory.exists()){
-            try {
-                FileUtils.deleteDirectory(directory);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 }

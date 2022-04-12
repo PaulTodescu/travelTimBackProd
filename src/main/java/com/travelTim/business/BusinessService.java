@@ -6,6 +6,7 @@ import com.travelTim.currency.Currency;
 import com.travelTim.currency.CurrencyConverter;
 import com.travelTim.files.ImageService;
 import com.travelTim.files.ImageType;
+import com.travelTim.files.ImageUtils;
 import com.travelTim.location.City;
 import com.travelTim.lodging.LegalPersonLodgingOfferDetailsDTO;
 import com.travelTim.lodging.LegalPersonLodgingOfferEntity;
@@ -29,13 +30,13 @@ public class BusinessService {
 
     private final BusinessDAO businessDAO;
     private final UserService userService;
-    private final ImageService imageService;
+    private final ImageUtils imageUtils;
 
     @Autowired
-    public BusinessService(BusinessDAO businessDAO, UserService userService, ImageService imageService) {
+    public BusinessService(BusinessDAO businessDAO, UserService userService, ImageUtils imageUtils) {
         this.businessDAO = businessDAO;
         this.userService = userService;
-        this.imageService = imageService;
+        this.imageUtils = imageUtils;
     }
 
     public Long addBusiness(BusinessEntity business) {
@@ -87,25 +88,25 @@ public class BusinessService {
             BusinessEntity business = this.findBusinessById(businessId);
             if (business.getLodgingOffers() != null){
                 for (LodgingOfferEntity lodgingOffer: business.getLodgingOffers()){
-                    this.imageService.deleteOfferImages("lodging", lodgingOffer.getId());
+                    this.imageUtils.deleteOfferImages("lodging", lodgingOffer.getId());
                 }
             }
             if (business.getFoodOffer() != null){
-                this.imageService.deleteOfferImages("food", business.getFoodOffer().getId());
+                this.imageUtils.deleteOfferImages("food", business.getFoodOffer().getId());
             }
             if (business.getAttractionOffers() != null){
                 for (AttractionOfferEntity attractionOffer: business.getAttractionOffers()) {
-                    this.imageService.deleteOfferImages("attractions", attractionOffer.getId());
+                    this.imageUtils.deleteOfferImages("attractions", attractionOffer.getId());
                 }
             }
             if (business.getActivityOffers() != null){
                 for (ActivityOfferEntity activityOffer: business.getActivityOffers()) {
-                    this.imageService.deleteOfferImages("activities", activityOffer.getId());
+                    this.imageUtils.deleteOfferImages("activities", activityOffer.getId());
                 }
             }
 
             this.businessDAO.deleteBusinessEntityById(businessId);
-            this.imageService.deleteImage(businessId, ImageType.BUSINESS);
+            this.imageUtils.deleteImage(businessId, ImageType.BUSINESS);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Business with id: " + businessId + " was not found!");
         }
