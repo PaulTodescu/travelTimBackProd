@@ -20,4 +20,12 @@ public class FoodDTOMapper {
     public Set<FoodOfferDTO> mapFoodOffersToDTOs(Set<FoodOfferEntity> foodOffers){
         return foodOffers.stream().map(this::mapFoodOfferToDTO).collect(Collectors.toSet());
     }
+
+    public FoodOfferBaseDetailsDTO mapFoodOfferToBaseDetailsDTO(FoodOfferEntity foodOffer){
+        return this.modelMapper.map(foodOffer, FoodOfferBaseDetailsDTO.class);
+    }
+
+    public Set<FoodOfferBaseDetailsDTO> mapFoodOffersToBaseDetailsDTOs(Set<FoodOfferEntity> foodOffers){
+        return foodOffers.stream().map(this::mapFoodOfferToBaseDetailsDTO).collect(Collectors.toSet());
+    }
 }

@@ -32,4 +32,12 @@ public class LodgingDTOMapper {
     public Set<LegalPersonLodgingOfferDetailsDTO> mapLodgingOffersToLodgingDetailsDTOs(Set<LegalPersonLodgingOfferEntity> lodgingOffers){
         return lodgingOffers.stream().map(this::mapLegalLodgingOfferToLodgingDetailsDTO).collect(Collectors.toSet());
     }
+
+    public LodgingOfferBaseDetailsDTO mapLodgingOfferToBaseDetailsDTO(LodgingOfferEntity lodgingOffer){
+        return this.modelMapper.map(lodgingOffer, LodgingOfferBaseDetailsDTO.class);
+    }
+
+    public Set<LodgingOfferBaseDetailsDTO> mapLodgingOffersToBaseDetailsDTOs(Set<LodgingOfferEntity> lodgingOffers){
+        return lodgingOffers.stream().map(this::mapLodgingOfferToBaseDetailsDTO).collect(Collectors.toSet());
+    }
 }

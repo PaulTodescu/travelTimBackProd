@@ -1,14 +1,22 @@
 package com.travelTim.user;
 
 
+import com.travelTim.activities.ActivityDTOMapper;
+import com.travelTim.activities.ActivityOfferBaseDetailsDTO;
 import com.travelTim.activities.ActivityOfferEntity;
+import com.travelTim.attractions.AttractionDTOMapper;
+import com.travelTim.attractions.AttractionOfferBaseDetailsDTO;
 import com.travelTim.attractions.AttractionOfferEntity;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.currency.Currency;
+import com.travelTim.currency.CurrencyConverter;
 import com.travelTim.files.ImageService;
 import com.travelTim.files.ImageType;
 import com.travelTim.files.ImageUtils;
+import com.travelTim.food.FoodDTOMapper;
+import com.travelTim.food.FoodOfferBaseDetailsDTO;
 import com.travelTim.food.FoodOfferEntity;
-import com.travelTim.lodging.LodgingOfferEntity;
+import com.travelTim.lodging.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,10 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -141,25 +149,74 @@ public class UserService {
         return businesses;
     }
 
-    public Set<FoodOfferEntity> getAllFoodOffersForCurrentUser() {
-        UserEntity loggedInUser = this.findLoggedInUser();
-        return loggedInUser.getFoodOffers();
+
+    public List<LodgingOfferBaseDetailsDTO> getAllLodgingOffersForCurrentUser() throws IOException {
+        UserEntity user = this.findLoggedInUser();
+
+        LodgingDTOMapper mapper = new LodgingDTOMapper();
+        // offers with price in EUR need to be converted to RON
+        CurrencyConverter currencyConverter = new CurrencyConverter();
+        Float conversionRate = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
+        Set<LodgingOfferBaseDetailsDTO> offers = mapper.mapLodgingOffersToBaseDetailsDTOs(user.getLodgingOffers());
+        for (LodgingOfferBaseDetailsDTO offer: offers){
+            if (offer.getCurrency() == Currency.EUR){
+                offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRate));
+                offer.setCurrency(Currency.RON);
+            }
+            if (offer.getBusiness() != null) { // offer is of legal type
+                offer.setAddress(offer.getBusiness().getAddress());
+                offer.setCity(offer.getBusiness().getCity());
+                offer.setImage(this.imageService.getBusinessFrontImage(offer.getBusiness().getId()));
+            } else { // offer is of physical type
+                offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));
+            }
+        }
+        return offers.stream()
+                .sorted(Comparator.comparing(LodgingOfferBaseDetailsDTO::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<FoodOfferBaseDetailsDTO> getAllFoodOffersForCurrentUser() {
+        UserEntity user = this.findLoggedInUser();
+        FoodDTOMapper mapper = new FoodDTOMapper();
+        Set<FoodOfferBaseDetailsDTO> offers = mapper.mapFoodOffersToBaseDetailsDTOs(
+                user.getFoodOffers()
+        );
+        for (FoodOfferBaseDetailsDTO offer: offers){
+            offer.setImage(this.imageService.getBusinessFrontImage(offer.getBusiness().getId()));
+        }
+        return offers.stream()
+                .sorted(Comparator.comparing(FoodOfferBaseDetailsDTO::getCreatedAt).reversed())
+                .collect(Collectors.toList());
     }
 
 
-    public Set<AttractionOfferEntity> getAllAttractionOffersForCurrentUser() {
-        UserEntity loggedInUser = this.findLoggedInUser();
-        return loggedInUser.getAttractionOffers();
+    public List<AttractionOfferBaseDetailsDTO> getAllAttractionOffersForCurrentUser() {
+        UserEntity user = this.findLoggedInUser();
+        AttractionDTOMapper mapper = new AttractionDTOMapper();
+        Set<AttractionOfferBaseDetailsDTO> offers = mapper.mapAttractionOffersToBaseDetailsDTOs(
+                user.getAttractionOffers()
+        );
+        for (AttractionOfferBaseDetailsDTO offer: offers) {
+            offer.setImage(this.imageService.getOfferFrontImage("attractions", offer.getId()));
+        }
+        return offers.stream()
+                .sorted(Comparator.comparing(AttractionOfferBaseDetailsDTO::getCreatedAt).reversed())
+                .collect(Collectors.toList());
     }
 
-    public Set<ActivityOfferEntity> getAllActivityOffersForCurrentUser() {
-        UserEntity loggedInUser = this.findLoggedInUser();
-        return loggedInUser.getActivityOffers();
-    }
-
-    public Set<LodgingOfferEntity> getAllLodgingOffersForCurrentUser() {
-        UserEntity loggedInUser = this.findLoggedInUser();
-        return loggedInUser.getLodgingOffers();
+    public List<ActivityOfferBaseDetailsDTO> getAllActivityOffersForCurrentUser() {
+        UserEntity user = this.findLoggedInUser();
+        ActivityDTOMapper mapper = new ActivityDTOMapper();
+        Set<ActivityOfferBaseDetailsDTO> offers = mapper.mapActivityOffersToBaseDetailsDTOs(
+                user.getActivityOffers()
+        );
+        for (ActivityOfferBaseDetailsDTO offer: offers) {
+            offer.setImage(this.imageService.getOfferFrontImage("activities", offer.getId()));
+        }
+        return offers.stream()
+                .sorted(Comparator.comparing(ActivityOfferBaseDetailsDTO::getCreatedAt).reversed())
+                .collect(Collectors.toList());
     }
 
 }

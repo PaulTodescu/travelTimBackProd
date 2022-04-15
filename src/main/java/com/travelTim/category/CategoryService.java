@@ -76,6 +76,7 @@ public class CategoryService {
         for (LodgingOfferDTO offer: offers){
             if (offer.getCurrency() == Currency.EUR){
                 offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRate));
+                offer.setCurrency(Currency.RON);
             }
             if (offer.getBusiness() != null) { // offer is of legal type
                 offer.setImage(this.imageService.getBusinessImages(offer.getBusiness().getId()).get(0));

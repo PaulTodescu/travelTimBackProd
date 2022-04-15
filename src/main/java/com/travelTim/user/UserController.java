@@ -1,9 +1,14 @@
 package com.travelTim.user;
 
+import com.travelTim.activities.ActivityOfferBaseDetailsDTO;
 import com.travelTim.activities.ActivityOfferEntity;
+import com.travelTim.attractions.AttractionOfferBaseDetailsDTO;
 import com.travelTim.attractions.AttractionOfferEntity;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.food.FoodOfferBaseDetailsDTO;
 import com.travelTim.food.FoodOfferEntity;
+import com.travelTim.lodging.LodgingOfferBaseDetailsDTO;
+import com.travelTim.lodging.LodgingOfferDTO;
 import com.travelTim.lodging.LodgingOfferEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -88,26 +94,26 @@ public class UserController {
     }
 
     @GetMapping("/offers/lodging")
-    public ResponseEntity<Set<LodgingOfferEntity>> getAllLodgingOffersForCurrentUser(){
-        Set<LodgingOfferEntity> lodgingOffers = this.userService.getAllLodgingOffersForCurrentUser();
+    public ResponseEntity<List<LodgingOfferBaseDetailsDTO>> getAllLodgingOffersForCurrentUser() throws IOException {
+        List<LodgingOfferBaseDetailsDTO> lodgingOffers = this.userService.getAllLodgingOffersForCurrentUser();
         return new ResponseEntity<>(lodgingOffers, HttpStatus.OK);
     }
 
     @GetMapping("/offers/food")
-    public ResponseEntity<Set<FoodOfferEntity>> getAllFoodOffersForCurrentUser(){
-        Set<FoodOfferEntity> foodOffers = this.userService.getAllFoodOffersForCurrentUser();
+    public ResponseEntity<List<FoodOfferBaseDetailsDTO>> getAllFoodOffersForCurrentUser(){
+        List<FoodOfferBaseDetailsDTO> foodOffers = this.userService.getAllFoodOffersForCurrentUser();
         return new ResponseEntity<>(foodOffers, HttpStatus.OK);
     }
 
     @GetMapping("/offers/attraction")
-    public ResponseEntity<Set<AttractionOfferEntity>> getAllAttractionOffersForCurrentUser(){
-        Set<AttractionOfferEntity> attractionOffers = this.userService.getAllAttractionOffersForCurrentUser();
+    public ResponseEntity<List<AttractionOfferBaseDetailsDTO>> getAllAttractionOffersForCurrentUser(){
+        List<AttractionOfferBaseDetailsDTO> attractionOffers = this.userService.getAllAttractionOffersForCurrentUser();
         return new ResponseEntity<>(attractionOffers, HttpStatus.OK);
     }
 
     @GetMapping("/offers/activity")
-    public ResponseEntity<Set<ActivityOfferEntity>> getAllActivityOffersForCurrentUser(){
-        Set<ActivityOfferEntity> activityOffers = this.userService.getAllActivityOffersForCurrentUser();
+    public ResponseEntity<List<ActivityOfferBaseDetailsDTO>> getAllActivityOffersForCurrentUser(){
+        List<ActivityOfferBaseDetailsDTO> activityOffers = this.userService.getAllActivityOffersForCurrentUser();
         return new ResponseEntity<>(activityOffers, HttpStatus.OK);
     }
 

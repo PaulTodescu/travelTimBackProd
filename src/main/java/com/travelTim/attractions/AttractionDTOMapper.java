@@ -21,4 +21,12 @@ public class AttractionDTOMapper {
     public Set<AttractionOfferDTO> mapAttractionOffersToDTOs(Set<AttractionOfferEntity> attractionOffers){
         return attractionOffers.stream().map(this::mapAttractionOfferToDTO).collect(Collectors.toSet());
     }
+
+    public AttractionOfferBaseDetailsDTO mapAttractionOfferToBaseDetailsDTO(AttractionOfferEntity attractionOffer){
+        return modelMapper.map(attractionOffer, AttractionOfferBaseDetailsDTO.class);
+    }
+
+    public Set<AttractionOfferBaseDetailsDTO> mapAttractionOffersToBaseDetailsDTOs(Set<AttractionOfferEntity> attractionOffers){
+        return attractionOffers.stream().map(this::mapAttractionOfferToBaseDetailsDTO).collect(Collectors.toSet());
+    }
 }

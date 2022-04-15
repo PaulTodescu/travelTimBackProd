@@ -1,5 +1,7 @@
 package com.travelTim.activities;
 
+import com.travelTim.attractions.AttractionOfferBaseDetailsDTO;
+import com.travelTim.attractions.AttractionOfferEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -20,5 +22,13 @@ public class ActivityDTOMapper {
 
     public Set<ActivityOfferDTO> mapActivityOffersToDTOs(Set<ActivityOfferEntity> activityOffers){
         return activityOffers.stream().map(this::mapActivityOfferToDTO).collect(Collectors.toSet());
+    }
+
+    public ActivityOfferBaseDetailsDTO mapActivityOfferToBaseDetailsDTO(ActivityOfferEntity activityOffer){
+        return modelMapper.map(activityOffer, ActivityOfferBaseDetailsDTO.class);
+    }
+
+    public Set<ActivityOfferBaseDetailsDTO> mapActivityOffersToBaseDetailsDTOs(Set<ActivityOfferEntity> activityOffers){
+        return activityOffers.stream().map(this::mapActivityOfferToBaseDetailsDTO).collect(Collectors.toSet());
     }
 }
