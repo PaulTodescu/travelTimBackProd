@@ -156,20 +156,14 @@ public class UserService {
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         // offers with price in EUR need to be converted to RON
         CurrencyConverter currencyConverter = new CurrencyConverter();
-        Float conversionRate = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
+        //Float conversionRate = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
         Set<LodgingOfferBaseDetailsDTO> offers = mapper.mapLodgingOffersToBaseDetailsDTOs(user.getLodgingOffers());
         for (LodgingOfferBaseDetailsDTO offer: offers){
             if (offer.getCurrency() == Currency.EUR){
-                offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRate));
+               // offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRate));
                 offer.setCurrency(Currency.RON);
             }
-            if (offer.getBusiness() != null) { // offer is of legal type
-                offer.setAddress(offer.getBusiness().getAddress());
-                offer.setCity(offer.getBusiness().getCity());
-                offer.setImage(this.imageService.getBusinessFrontImage(offer.getBusiness().getId()));
-            } else { // offer is of physical type
-                offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));
-            }
+            offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));
         }
         return offers.stream()
                 .sorted(Comparator.comparing(LodgingOfferBaseDetailsDTO::getCreatedAt).reversed())
@@ -189,7 +183,6 @@ public class UserService {
                 .sorted(Comparator.comparing(FoodOfferBaseDetailsDTO::getCreatedAt).reversed())
                 .collect(Collectors.toList());
     }
-
 
     public List<AttractionOfferBaseDetailsDTO> getAllAttractionOffersForCurrentUser() {
         UserEntity user = this.findLoggedInUser();

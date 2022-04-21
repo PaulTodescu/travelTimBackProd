@@ -95,11 +95,16 @@ public class LodgingOfferService {
         return mapper.mapLegalLodgingOfferToBaseDetailsDTO(offer);
     }
 
-    public LodgingOfferEntity findPhysicalPersonLodgingOfferById(Long offerId, Currency currency)  {
-        PhysicalPersonLodgingOfferEntity offer = this.physicalPersonLodgingOfferDAO.findPhysicalPersonLodgingOfferEntityById(offerId)
+    public LodgingOfferEntity findPhysicalPersonLodgingOfferById(Long offerId)  {
+        return this.physicalPersonLodgingOfferDAO.findPhysicalPersonLodgingOfferEntityById(offerId)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Lodging offer of type physical person with id: " + offerId + " was not found")
         );
+    }
+
+    public LodgingOfferPriceDTO getLodgingOfferPrice(Long offerId, Currency currency) {
+        LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
+        Float convertedPrice = offer.getPrice();
         // convert offer price to the selected currency
         try {
             CurrencyConverter currencyConverter = new CurrencyConverter();
@@ -110,24 +115,22 @@ public class LodgingOfferService {
             if (offer.getCurrency() != currency) {
                 switch (offer.getCurrency()) {
                     case RON:
-                        offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromRON));
+                        convertedPrice = currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromRON);
                         break;
                     case EUR:
-                        offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR));
+                        convertedPrice = currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR);
                         break;
                     case GBP:
-                        offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromGBP));
+                        convertedPrice = currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromGBP);
                         break;
                     case USD:
-                        offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromUSD));
+                        convertedPrice = currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromUSD);
                         break;
-                    }
-                    offer.setCurrency(currency);
                 }
+            }
         } catch (IOException ioException) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not retrieve currency for monetary conversion");
         }
-        return offer;
+        return new LodgingOfferPriceDTO(convertedPrice, currency);
     }
-
 }

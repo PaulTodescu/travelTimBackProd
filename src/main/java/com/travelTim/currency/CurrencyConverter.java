@@ -47,7 +47,7 @@ public class CurrencyConverter {
 
         DecimalFormatSymbols separator = new DecimalFormatSymbols();
         separator.setDecimalSeparator('.');
-        DecimalFormat decimalFormat = new DecimalFormat("0.", separator);
+        DecimalFormat decimalFormat = new DecimalFormat("0.00", separator);
         return Float.parseFloat(decimalFormat.format(convertedPrice));
     }
 

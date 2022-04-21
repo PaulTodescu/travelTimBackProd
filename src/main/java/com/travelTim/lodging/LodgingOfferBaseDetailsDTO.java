@@ -1,7 +1,8 @@
 package com.travelTim.lodging;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.travelTim.business.BusinessDTO;
+import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.currency.Currency;
 import com.travelTim.location.City;
@@ -12,7 +13,6 @@ import java.time.LocalDateTime;
 public class LodgingOfferBaseDetailsDTO {
 
     private Long id;
-    @JsonIgnore
     private BusinessEntity business;
     private String title;
     private String address;
@@ -53,19 +53,16 @@ public class LodgingOfferBaseDetailsDTO {
         this.id = id;
     }
 
-    public BusinessEntity getBusiness() {
-        return business;
+    public BusinessDTO getBusiness() {
+        if (this.business != null) {
+            BusinessDTOMapper mapper = new BusinessDTOMapper();
+            return mapper.mapBusinessToDTO(business);
+        }
+        return null;
     }
 
     public void setBusiness(BusinessEntity business) {
         this.business = business;
-    }
-
-    public String getBusinessName(){
-        if (this.business != null) {
-            return this.business.getName();
-        }
-        return null;
     }
 
     public String getTitle() {

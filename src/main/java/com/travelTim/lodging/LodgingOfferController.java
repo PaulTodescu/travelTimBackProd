@@ -36,9 +36,8 @@ public class LodgingOfferController {
 
     @GetMapping(path = "/physical/{offerId}")
     public ResponseEntity<LodgingOfferEntity> findPhysicalPersonLodgingOfferById(
-            @PathVariable("offerId") Long offerId,
-            @RequestParam(value = "currency") Currency currency) {
-        LodgingOfferEntity offer = this.lodgingOfferService.findPhysicalPersonLodgingOfferById(offerId, currency);
+            @PathVariable("offerId") Long offerId) {
+        LodgingOfferEntity offer = this.lodgingOfferService.findPhysicalPersonLodgingOfferById(offerId);
         return new ResponseEntity<>(offer, HttpStatus.OK);
     }
 
@@ -47,5 +46,13 @@ public class LodgingOfferController {
             @PathVariable("offerId") Long offerId){
         LegalPersonLodgingOfferBaseDetailsDTO offer = this.lodgingOfferService.findLegalPersonLodgingOfferById(offerId);
         return new ResponseEntity<>(offer, HttpStatus.OK);
+    }
+
+    @GetMapping("/{offerId}/price")
+    public ResponseEntity<LodgingOfferPriceDTO> getLodgingOfferPrice(
+            @PathVariable("offerId") Long offerId,
+            @RequestParam(value = "currency") Currency currency){
+        LodgingOfferPriceDTO offerPrice = this.lodgingOfferService.getLodgingOfferPrice(offerId, currency);
+        return new ResponseEntity<>(offerPrice, HttpStatus.OK);
     }
 }
