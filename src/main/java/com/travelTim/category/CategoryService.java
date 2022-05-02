@@ -70,12 +70,11 @@ public class CategoryService {
 
         // offers with price in EUR need to be converted to RON
         CurrencyConverter currencyConverter = new CurrencyConverter();
-        Float conversionRate = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
-
+        Float conversionRateFromEUR = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
         Set<LodgingOfferDTO> offers = mapper.mapLodgingOffersToDTOs(category.getLodgingOffers());
         for (LodgingOfferDTO offer: offers){
             if (offer.getCurrency() == Currency.EUR){
-                offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRate));
+                offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR));
                 offer.setCurrency(Currency.RON);
             }
             if (offer.getBusiness() != null) { // offer is of legal type
@@ -92,8 +91,8 @@ public class CategoryService {
                 List<LodgingOfferEntity> offersListSortedByPrice = new ArrayList<>(lodgingOffers);
 
                 offersListSortedByPrice.sort((o1, o2) -> {
-                    Float priceOffer1 = currencyConverter.getConvertedPrice(o1.getPrice(), conversionRate);
-                    Float priceOffer2 = currencyConverter.getConvertedPrice(o2.getPrice(), conversionRate);
+                    Float priceOffer1 = currencyConverter.getConvertedPrice(o1.getPrice(), conversionRateFromEUR);
+                    Float priceOffer2 = currencyConverter.getConvertedPrice(o2.getPrice(), conversionRateFromEUR);
                     if (priceOffer1 < priceOffer2) {
                         return -1;
                     } else if (priceOffer1 > priceOffer2) {
@@ -105,7 +104,7 @@ public class CategoryService {
                 LodgingOfferEntity cheapestOffer = offersListSortedByPrice.get(0);
                 Float cheapestOfferPrice;
                 if (cheapestOffer.getCurrency() == Currency.EUR){
-                    cheapestOfferPrice = currencyConverter.getConvertedPrice(cheapestOffer.getPrice(), conversionRate);
+                    cheapestOfferPrice = currencyConverter.getConvertedPrice(cheapestOffer.getPrice(), conversionRateFromEUR);
                 } else {
                     cheapestOfferPrice = cheapestOffer.getPrice();
                 }

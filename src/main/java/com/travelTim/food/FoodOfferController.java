@@ -26,18 +26,39 @@ public class FoodOfferController {
         return new ResponseEntity<>(foodOfferId, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{foodOfferId}/menu")
-    public ResponseEntity<FoodOfferEntity> addFoodMenu(
+    @PutMapping(path = "/{foodOfferId}/menu")
+    public ResponseEntity<Void> addFoodMenu(
             @PathVariable("foodOfferId") Long foodOfferId,
             @RequestBody Map<FoodMenuCategory, List<FoodMenuItem>> foodMenu){
         this.foodOfferService.addFoodOfferMenu(foodOfferId, foodMenu);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{offerId}")
+    @PutMapping(path = "/{offerId}")
+    public ResponseEntity<Void> editFoodOffer(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody FoodOfferEditDTO offerToSave){
+        this.foodOfferService.editFoodOffer(offerToSave, offerId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{offerId}")
     public ResponseEntity<FoodOfferEntity> findFoodOfferById(
             @PathVariable("offerId") Long offerId) {
         FoodOfferEntity offer = this.foodOfferService.findFoodOfferById(offerId);
+        return new ResponseEntity<>(offer, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/{offerId}")
+    public ResponseEntity<Void> deleteFoodOffer(@PathVariable("offerId") Long offerId){
+        this.foodOfferService.deleteFoodOffer(offerId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/edit/get/{offerId}")
+    public ResponseEntity<FoodOfferEditDTO> findFoodOfferForEdit(
+            @PathVariable("offerId") Long offerId){
+        FoodOfferEditDTO offer = this.foodOfferService.findFoodOfferForEdit(offerId);
         return new ResponseEntity<>(offer, HttpStatus.OK);
     }
 

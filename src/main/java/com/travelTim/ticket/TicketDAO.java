@@ -14,4 +14,6 @@ public interface TicketDAO extends JpaRepository<TicketEntity, Long> {
 
     Optional<TicketEntity> findTicketEntityByNameAndPrice(String name, Double price);
 
+    void deleteTicketEntityById(Long id);
+
 }

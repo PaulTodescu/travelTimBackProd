@@ -10,4 +10,6 @@ public interface AttractionOfferDAO extends JpaRepository<AttractionOfferEntity,
 
     Optional<AttractionOfferEntity> findAttractionsOfferEntityById(Long id);
 
+    void deleteAttractionOfferEntityById(Long id);
+
 }

@@ -47,7 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/food/{offerId}", "/attraction/{offerId}", "/activity/{offerId}",
                         "/image/user/{userId}", "/image/offer/{offerId}",
                         "/lodging/legal/{offerId}", "/image/business/{businessId}",
-                        "/business/{businessId}/offers/lodging", "/lodging/{offerId}/price")
+                        "/business/{businessId}/offers/lodging", "/lodging/{offerId}/price",
+                        "/currency/**", "/image/business/{businessId}/front",
+                        "/image/business/{businessId}/all")
                 .permitAll()
                 .antMatchers(HttpMethod.OPTIONS,"*")
                 .permitAll().anyRequest().authenticated()

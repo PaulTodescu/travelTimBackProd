@@ -1,49 +1,49 @@
 package com.travelTim.lodging;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.currency.Currency;
 import com.travelTim.location.City;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.Set;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class LodgingOfferDTO {
-
+public class PhysicalPersonLodgingOfferEditDTO {
     private Long id;
-    private BusinessEntity business;
     private String title;
     private String address;
     private City city;
     private Integer nrRooms;
+    private Integer nrBathrooms;
     private Integer nrSingleBeds;
     private Integer nrDoubleBeds;
     private Integer floor;
-    private String image;
-    private LocalDateTime createdAt;
-    private Integer nrLodgingOffers;
     private Float price;
     private Currency currency;
+    private String description;
+    private Set<LodgingOfferUtilityEntity> utilities;
 
-    public LodgingOfferDTO() {
+    public PhysicalPersonLodgingOfferEditDTO() {
     }
 
-    public LodgingOfferDTO(Long id, BusinessEntity business, String title, String address, City city,
-                           Integer nrRooms, Integer nrSingleBeds, Integer nrDoubleBeds,
-                           Integer floor,LocalDateTime createdAt, Float price, Currency currency) {
+    public PhysicalPersonLodgingOfferEditDTO(Long id, String title, String address, City city,
+                                             Integer nrRooms, Integer nrBathrooms,
+                                             Integer nrSingleBeds, Integer nrDoubleBeds,
+                                             Integer floor, Float price, Currency currency,
+                                             String description,
+                                             Set<LodgingOfferUtilityEntity> utilities) {
         this.id = id;
-        this.business = business;
         this.title = title;
         this.address = address;
         this.city = city;
         this.nrRooms = nrRooms;
+        this.nrBathrooms = nrBathrooms;
         this.nrSingleBeds = nrSingleBeds;
         this.nrDoubleBeds = nrDoubleBeds;
         this.floor = floor;
-        this.createdAt = createdAt;
         this.price = price;
         this.currency = currency;
+        this.description = description;
+        this.utilities = utilities;
     }
 
     public Long getId() {
@@ -52,14 +52,6 @@ public class LodgingOfferDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public BusinessEntity getBusiness() {
-        return business;
-    }
-
-    public void setBusiness(BusinessEntity business) {
-        this.business = business;
     }
 
     public String getTitle() {
@@ -94,6 +86,14 @@ public class LodgingOfferDTO {
         this.nrRooms = nrRooms;
     }
 
+    public Integer getNrBathrooms() {
+        return nrBathrooms;
+    }
+
+    public void setNrBathrooms(Integer nrBathrooms) {
+        this.nrBathrooms = nrBathrooms;
+    }
+
     public Integer getNrSingleBeds() {
         return nrSingleBeds;
     }
@@ -118,29 +118,6 @@ public class LodgingOfferDTO {
         this.floor = floor;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public Integer getNrLodgingOffers() {
-        if (this.business != null) {
-            return this.business.getLodgingOffers().size();
-        }
-        return null;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Float getPrice() {
         return price;
     }
@@ -157,16 +134,19 @@ public class LodgingOfferDTO {
         this.currency = currency;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof LodgingOfferDTO)) return false;
-        LodgingOfferDTO that = (LodgingOfferDTO) o;
-        return Objects.equals(getBusiness(), that.getBusiness()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getAddress(), that.getAddress());
+    public String getDescription() {
+        return description;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getBusiness(), getTitle(), getAddress());
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Set<LodgingOfferUtilityEntity> getUtilities() {
+        return utilities;
+    }
+
+    public void setUtilities(Set<LodgingOfferUtilityEntity> utilities) {
+        this.utilities = utilities;
     }
 }

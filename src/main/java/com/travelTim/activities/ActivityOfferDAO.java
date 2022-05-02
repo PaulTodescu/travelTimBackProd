@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface ActivityOfferDAO extends JpaRepository<ActivityOfferEntity, Long> {
 
     Optional<ActivityOfferEntity> findActivityOfferEntityById(Long id);
+
+    void deleteActivityOfferEntityById(Long id);
 }

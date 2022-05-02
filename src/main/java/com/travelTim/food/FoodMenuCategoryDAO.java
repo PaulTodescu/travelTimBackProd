@@ -10,4 +10,6 @@ public interface FoodMenuCategoryDAO extends JpaRepository<FoodMenuCategory, Lon
 
     Optional<FoodMenuCategory> findFoodMenuCategoryByName(String name);
 
+    void deleteFoodMenuCategoryById(Long id);
+
 }

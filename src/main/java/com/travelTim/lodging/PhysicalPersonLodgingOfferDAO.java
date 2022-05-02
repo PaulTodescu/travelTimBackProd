@@ -9,7 +9,4 @@ import java.util.Optional;
 public interface PhysicalPersonLodgingOfferDAO extends JpaRepository<PhysicalPersonLodgingOfferEntity, Long> {
 
     Optional<PhysicalPersonLodgingOfferEntity> findPhysicalPersonLodgingOfferEntityById(Long id);
-
-    void deletePhysicalPersonLodgingOfferEntityById(Long id);
-
 }

@@ -12,4 +12,6 @@ public interface FoodMenuItemDAO extends JpaRepository<FoodMenuItem, Long> {
 
     Optional<FoodMenuItem> findFoodMenuItemByNameAndWeightAndPrice(String name, Double weight, Double price);
 
+    void deleteFoodMenuItemById(Long id);
+
 }

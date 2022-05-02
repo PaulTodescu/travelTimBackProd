@@ -127,6 +127,18 @@ public class ImageUtils {
         return images;
     }
 
+    public List<String> getImagesNames(String path){
+        File imageDirectory = new File(path);
+        List<String> imageNames = new ArrayList<>();
+        File[] images = imageDirectory.listFiles();
+        if (images != null) {
+            for(File image: images){
+                imageNames.add(image.getName());
+            }
+        }
+        return imageNames;
+    }
+
     public String getImagePath(Long id, ImageType imageType) {
         String path = this.getUploadPath(imageType, id);
         if (path == null){

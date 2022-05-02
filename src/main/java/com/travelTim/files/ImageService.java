@@ -129,14 +129,10 @@ public class ImageService {
         if (directory == null){
             return;
         }
-
-        int nrFiles = Objects.requireNonNull(directory.list()).length;
-        if (nrFiles != 0) {
-            try {
-                FileUtils.cleanDirectory(directory);
-            } catch (IOException e){
-                e.printStackTrace();
-            }
+        try {
+            FileUtils.cleanDirectory(directory);
+        } catch (IOException e){
+            e.printStackTrace();
         }
 
         for (MultipartFile image: offerImages) {
@@ -149,6 +145,14 @@ public class ImageService {
                 throw new RuntimeException("Could not store file " + image.getOriginalFilename());
             }
         }
+    }
+
+    public List<String> getOfferImagesNames(String offerType, Long offerId) {
+        String path = this.imageUtils.getOfferUploadPath(offerType, offerId);
+        if (path == null){
+            return Collections.emptyList();
+        }
+        return this.imageUtils.getImagesNames(path);
     }
 
     public String getUserImage(Long userId){
@@ -170,15 +174,7 @@ public class ImageService {
 
     public List<String> getBusinessImagesNames(Long businessId){
         String path = this.imageUtils.getUploadPath(ImageType.BUSINESS, businessId);
-        File imageDirectory = new File(path);
-        List<String> imageNames = new ArrayList<>();
-        File[] images = imageDirectory.listFiles();
-        if (images != null) {
-            for(File image: images){
-                imageNames.add(image.getName());
-            }
-        }
-        return imageNames;
+        return this.imageUtils.getImagesNames(path);
     }
 
     public List<String> getOfferImages(String offerType, Long offerId){

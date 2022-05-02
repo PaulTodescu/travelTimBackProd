@@ -13,9 +13,8 @@ import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "attraction_offer")
@@ -140,7 +139,9 @@ public class AttractionOfferEntity {
     }
 
     public Set<TicketEntity> getTickets() {
-        return tickets;
+        return tickets.stream()
+                .sorted(Comparator.comparing(TicketEntity::getName))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void setTickets(Set<TicketEntity> tickets) {
@@ -170,13 +171,5 @@ public class AttractionOfferEntity {
     public void removeTicket(TicketEntity ticket){
         this.tickets.remove(ticket);
         ticket.getAttractionOffers().remove(this);
-    }
-
-    @PreRemove
-    public void preRemove(){
-        for (Iterator<TicketEntity> iterator = this.tickets.iterator(); iterator.hasNext();){
-            iterator.next();
-            iterator.remove();
-        }
     }
 }

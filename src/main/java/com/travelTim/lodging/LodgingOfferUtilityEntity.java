@@ -52,4 +52,8 @@ public class LodgingOfferUtilityEntity {
         this.lodgingOffers = lodgingOffers;
     }
 
+    @Override
+    public String toString() {
+        return "[id: " + id + ", name: " + name + "]";
+    }
 }

@@ -9,8 +9,8 @@ import com.travelTim.lodging.LegalPersonLodgingOfferEntity;
 import com.travelTim.user.UserEntity;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "business")
@@ -42,7 +42,7 @@ public class BusinessEntity {
     @JsonIgnore
     private Set<LegalPersonLodgingOfferEntity> lodgingOffers = new HashSet<>();
 
-    @OneToOne(mappedBy = "business", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "business")
     @JsonIgnore
     private FoodOfferEntity foodOffer;
 
@@ -53,6 +53,14 @@ public class BusinessEntity {
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<ActivityOfferEntity> activityOffers = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "business_schedule",
+            joinColumns = {@JoinColumn(name = "business_id")},
+            inverseJoinColumns = {@JoinColumn(name = "day_schedule_id")}
+    )
+    private Set<BusinessDaySchedule> schedule = new HashSet<>();
 
     public BusinessEntity() {
     }
@@ -145,4 +153,17 @@ public class BusinessEntity {
         this.activityOffers = activityOffers;
     }
 
+    public Set<BusinessDaySchedule> getSchedule() {
+        return schedule.stream()
+                .sorted(Comparator.comparing(
+                        daySchedule -> List.of("Monday","Tuesday","Wednesday", "Thursday",
+                        "Friday","Saturday","Sunday")
+                                .indexOf(daySchedule.getDay().toString())))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+    }
+
+    public void setSchedule(Set<BusinessDaySchedule> schedule) {
+        this.schedule = schedule;
+    }
 }

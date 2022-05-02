@@ -164,6 +164,10 @@ public abstract class LodgingOfferEntity {
         this.utilities = utilities;
     }
 
+    public void addUtility(LodgingOfferUtilityEntity utility) {
+        this.utilities.add(utility);
+    }
+
     public UserDetailsDTO getUser() {
         UserDTOMapper mapper = new UserDTOMapper();
         return  mapper.mapUserToUserDetailsDTO(this.user);
@@ -189,11 +193,4 @@ public abstract class LodgingOfferEntity {
         this.createdAt = createdAt;
     }
 
-    @PreRemove
-    public void preRemove(){
-        for (Iterator<LodgingOfferUtilityEntity> iterator = this.utilities.iterator(); iterator.hasNext();){
-            iterator.next();
-            iterator.remove();
-        }
-    }
 }

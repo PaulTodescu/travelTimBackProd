@@ -4,10 +4,13 @@ package com.travelTim.user;
 import com.travelTim.activities.ActivityDTOMapper;
 import com.travelTim.activities.ActivityOfferBaseDetailsDTO;
 import com.travelTim.activities.ActivityOfferEntity;
+import com.travelTim.activities.ActivityOfferService;
 import com.travelTim.attractions.AttractionDTOMapper;
 import com.travelTim.attractions.AttractionOfferBaseDetailsDTO;
 import com.travelTim.attractions.AttractionOfferEntity;
+import com.travelTim.attractions.AttractionOfferService;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.business.BusinessService;
 import com.travelTim.currency.Currency;
 import com.travelTim.currency.CurrencyConverter;
 import com.travelTim.files.ImageService;
@@ -16,9 +19,11 @@ import com.travelTim.files.ImageUtils;
 import com.travelTim.food.FoodDTOMapper;
 import com.travelTim.food.FoodOfferBaseDetailsDTO;
 import com.travelTim.food.FoodOfferEntity;
+import com.travelTim.food.FoodOfferService;
 import com.travelTim.lodging.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +32,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,17 +42,27 @@ public class UserService {
     private final UserDAO userDAO;
     private final ImageService imageService;
     private final ImageUtils imageUtils;
-
+    private final LodgingOfferService lodgingOfferService;
+    private final FoodOfferService foodOfferService;
+    private final AttractionOfferService attractionOfferService;
+    private final ActivityOfferService activityOfferService;
 
     @Autowired
-    public UserService(UserDAO userDAO, ImageService imageService, ImageUtils imageUtils) {
+    public UserService(UserDAO userDAO, ImageService imageService, ImageUtils imageUtils,
+                       @Lazy LodgingOfferService lodgingOfferService,
+                       @Lazy FoodOfferService foodOfferService,
+                       @Lazy AttractionOfferService attractionOfferService,
+                       @Lazy ActivityOfferService activityOfferService) {
         this.userDAO = userDAO;
         this.imageService = imageService;
         this.imageUtils = imageUtils;
+        this.lodgingOfferService = lodgingOfferService;
+        this.foodOfferService = foodOfferService;
+        this.attractionOfferService = attractionOfferService;
+        this.activityOfferService = activityOfferService;
     }
 
     public void addUser(UserEntity user) {
-
         Optional<UserEntity> userOptional = userDAO.findUserEntityByEmail(user.getEmail());
         if (userOptional.isPresent()){
             throw new IllegalArgumentException("User with email " + user.getEmail() + " already exists");
@@ -137,9 +151,34 @@ public class UserService {
     }
 
     public void deleteUser() {
-        UserEntity loggedInUser = this.findLoggedInUser();
-        this.userDAO.deleteUserEntityById(loggedInUser.getId());
-        this.imageUtils.deleteImage(loggedInUser.getId(), ImageType.USER);
+        UserEntity user = this.findLoggedInUser();
+        if (user.getLodgingOffers().size() > 0){
+            for (LodgingOfferEntity offer: user.getLodgingOffers()){
+                this.lodgingOfferService.deleteLodgingOffer(offer.getId());
+            }
+        }
+        if (user.getFoodOffers().size() > 0){
+            for (FoodOfferEntity offer: user.getFoodOffers()){
+                this.foodOfferService.deleteFoodOfferMenu(offer);
+            }
+        }
+        if (user.getAttractionOffers().size() > 0){
+            for (AttractionOfferEntity offer: user.getAttractionOffers()){
+                this.attractionOfferService.deleteAttractionOffer(offer.getId());
+            }
+        }
+        if (user.getActivityOffers().size() > 0){
+            for (ActivityOfferEntity offer: user.getActivityOffers()){
+                this.activityOfferService.deleteActivityOffer(offer.getId());
+            }
+        }
+        if (user.getBusinesses().size() > 0){
+            for (BusinessEntity business: user.getBusinesses()){
+                this.imageUtils.deleteImage(business.getId(), ImageType.BUSINESS);
+            }
+        }
+        this.userDAO.deleteUserEntityById(user.getId());
+        this.imageUtils.deleteImage(user.getId(), ImageType.USER);
     }
 
     public List<BusinessEntity> getAllBusinessesForCurrentUser() {
@@ -156,11 +195,11 @@ public class UserService {
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         // offers with price in EUR need to be converted to RON
         CurrencyConverter currencyConverter = new CurrencyConverter();
-        //Float conversionRate = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
+        Float conversionRateFromEUR = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
         Set<LodgingOfferBaseDetailsDTO> offers = mapper.mapLodgingOffersToBaseDetailsDTOs(user.getLodgingOffers());
         for (LodgingOfferBaseDetailsDTO offer: offers){
             if (offer.getCurrency() == Currency.EUR){
-               // offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRate));
+                offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR));
                 offer.setCurrency(Currency.RON);
             }
             offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));

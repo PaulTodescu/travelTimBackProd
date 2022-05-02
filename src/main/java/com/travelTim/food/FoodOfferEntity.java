@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "food_offer")
@@ -27,7 +28,7 @@ public class FoodOfferEntity {
     private UserEntity user;
 
     @OneToOne
-    @JoinColumn(name = "business_id", unique = true, nullable = false)
+    @JoinColumn(columnDefinition = "business_id")
     private BusinessEntity business;
 
     @Column(nullable = false)
@@ -80,7 +81,14 @@ public class FoodOfferEntity {
     }
 
     public Set<FoodMenuCategory> getFoodMenuCategories() {
-        return foodMenuCategories;
+        for (FoodMenuCategory category: this.foodMenuCategories){
+            category.setFoodMenuItems(category.getFoodMenuItems().stream()
+                    .sorted(Comparator.comparing(FoodMenuItem::getName))
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+        }
+        return this.foodMenuCategories.stream()
+                .sorted(Comparator.comparing(FoodMenuCategory::getName))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void setFoodMenuCategories(Set<FoodMenuCategory> foodMenuCategories) {
@@ -115,17 +123,4 @@ public class FoodOfferEntity {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-    @PreRemove // remove food menu prior to removing food offer
-    public void preRemove(){
-        for (Iterator<FoodMenuCategory> iterator1 = this.foodMenuCategories.iterator(); iterator1.hasNext();){
-            FoodMenuCategory category = iterator1.next();
-            for (Iterator<FoodMenuItem> iterator2 = category.getFoodMenuItems().iterator(); iterator2.hasNext();){
-                iterator2.next();
-                iterator2.remove();
-            }
-            iterator1.remove();
-        }
-    }
-
 }

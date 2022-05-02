@@ -82,18 +82,26 @@ public class ImageController {
     public ResponseEntity<?> addOfferImages(
             @PathVariable("offerId") Long offerId,
             @RequestParam(value = "offerType") String offerType,
-            @RequestParam(value = "images") List<MultipartFile> images) {
+            @RequestParam(value = "images") List<MultipartFile> images) throws IOException {
         this.imageService.uploadOfferImages(offerId, images, offerType);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(path = "/offer/{offerId}")
     @CrossOrigin
-    public ResponseEntity<List<String>> getOfferImagesImage(
+    public ResponseEntity<List<String>> getOfferImages(
             @RequestParam(value = "offerType") String offerType,
             @PathVariable("offerId") Long offerId){
         List<String> offerImages = this.imageService.getOfferImages(offerType, offerId);
         return new ResponseEntity<>(offerImages, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/offer/{offerId}/names")
+    public ResponseEntity<List<String>> getOfferImagesNames(
+            @RequestParam(value = "offerType") String offerType,
+            @PathVariable("offerId") Long offerId){
+        List<String> offerImagesNames = this.imageService.getOfferImagesNames(offerType, offerId);
+        return new ResponseEntity<>(offerImagesNames, HttpStatus.OK);
     }
 
 }

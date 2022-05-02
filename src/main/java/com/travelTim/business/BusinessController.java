@@ -38,6 +38,14 @@ public class BusinessController {
         return new ResponseEntity<>(job, HttpStatus.OK);
     }
 
+    @PutMapping(path = "/{businessId}/schedule")
+    public ResponseEntity<Void> addBusinessSchedule(
+            @PathVariable("businessId") Long businessId,
+            @RequestBody Set<BusinessDaySchedule> schedule){
+        this.businessService.addSchedule(businessId, schedule);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PutMapping("/{businessId}")
     public ResponseEntity<BusinessEntity> editBusiness(
             @RequestBody BusinessEntity business,
@@ -66,9 +74,8 @@ public class BusinessController {
 
     @GetMapping(path = "/{businessId}/offers/lodging")
     public ResponseEntity<List<LegalPersonLodgingOfferDetailsDTO>> getLodgingOffers(
-            @PathVariable("businessId") Long businessId,
-            @RequestParam(value = "currency") Currency currency) throws IOException {
-        List<LegalPersonLodgingOfferDetailsDTO> offers = this.businessService.getLodgingOffers(businessId, currency);
+            @PathVariable("businessId") Long businessId) throws IOException {
+        List<LegalPersonLodgingOfferDetailsDTO> offers = this.businessService.getLodgingOffers(businessId);
         return new ResponseEntity<>(offers, HttpStatus.OK);
     }
 

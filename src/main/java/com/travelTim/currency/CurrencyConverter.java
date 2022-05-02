@@ -44,7 +44,6 @@ public class CurrencyConverter {
 
     public Float getConvertedPrice(Float amount, Float conversionRate){
         Float convertedPrice = amount * conversionRate;
-
         DecimalFormatSymbols separator = new DecimalFormatSymbols();
         separator.setDecimalSeparator('.');
         DecimalFormat decimalFormat = new DecimalFormat("0.00", separator);

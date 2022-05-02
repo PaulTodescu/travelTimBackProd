@@ -28,4 +28,8 @@ public class FoodDTOMapper {
     public Set<FoodOfferBaseDetailsDTO> mapFoodOffersToBaseDetailsDTOs(Set<FoodOfferEntity> foodOffers){
         return foodOffers.stream().map(this::mapFoodOfferToBaseDetailsDTO).collect(Collectors.toSet());
     }
+
+    public FoodOfferEditDTO mapFoodOfferToEditDTO(FoodOfferEntity foodOffer){
+        return modelMapper.map(foodOffer, FoodOfferEditDTO.class);
+    }
 }
