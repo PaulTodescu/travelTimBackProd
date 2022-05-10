@@ -1,6 +1,6 @@
 package com.travelTim.activities;
 
-import com.travelTim.attractions.AttractionOfferEditDTO;
+import com.travelTim.contact.OfferContactEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +24,41 @@ public class ActivityOfferController {
         return new ResponseEntity<>(activityId, HttpStatus.CREATED);
     }
 
+    @PutMapping(path = "/{offerId}/contact/add")
+    public ResponseEntity<Void> addOfferContact(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferContactEntity offerContact){
+        this.activityOfferService.addContactDetails(offerId, offerContact);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/{offerId}/contact/edit")
+    public ResponseEntity<Void> editOfferContact(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferContactEntity offerContact){
+        this.activityOfferService.editContactDetails(offerId, offerContact);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{offerId}/contact")
+    public ResponseEntity<OfferContactEntity> getOfferContact(
+            @PathVariable("offerId") Long offerId){
+        OfferContactEntity contact = this.activityOfferService.getContactDetails(offerId);
+        return new ResponseEntity<>(contact, HttpStatus.OK);
+    }
+
+
     @GetMapping("/{offerId}")
     public ResponseEntity<ActivityOfferEntity> findActivityOfferById(
             @PathVariable("offerId") Long offerId) {
         ActivityOfferEntity offer = this.activityOfferService.findActivityOfferById(offerId);
+        return new ResponseEntity<>(offer, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{offerId}/details")
+    public ResponseEntity<ActivityOfferDetailsDTO> getActivityOfferDetails(
+            @PathVariable("offerId") Long offerId) {
+        ActivityOfferDetailsDTO offer = this.activityOfferService.getActivityOfferDetails(offerId);
         return new ResponseEntity<>(offer, HttpStatus.OK);
     }
 
@@ -51,4 +82,6 @@ public class ActivityOfferController {
         this.activityOfferService.editActivityOffer(offerId, offerToSave);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
 }

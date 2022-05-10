@@ -1,5 +1,6 @@
 package com.travelTim.attractions;
 
+import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.ticket.TicketEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.Set;
 
 @Controller
@@ -26,7 +28,30 @@ public class AttractionOfferController {
         return new ResponseEntity<>(attractionId, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{offerId}")
+    @PutMapping(path = "/{offerId}/contact/add")
+    public ResponseEntity<Void> addOfferContact(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferContactEntity offerContact){
+        this.attractionOfferService.addContactDetails(offerId, offerContact);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/{offerId}/contact/edit")
+    public ResponseEntity<Void> editOfferContact(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferContactEntity offerContact){
+        this.attractionOfferService.editContactDetails(offerId, offerContact);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{offerId}/contact")
+    public ResponseEntity<OfferContactEntity> getOfferContact(
+            @PathVariable("offerId") Long offerId){
+        OfferContactEntity contact = this.attractionOfferService.getContactDetails(offerId);
+        return new ResponseEntity<>(contact, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{offerId}")
     public ResponseEntity<AttractionOfferEntity> findAttractionOfferById(
             @PathVariable("offerId") Long offerId) {
         AttractionOfferEntity offer = this.attractionOfferService.findAttractionOfferById(offerId);
@@ -37,6 +62,13 @@ public class AttractionOfferController {
     public ResponseEntity<?> deleteAttractionOffer(@PathVariable("offerId") Long offerId){
         this.attractionOfferService.deleteAttractionOffer(offerId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{offerId}/details")
+    public ResponseEntity<AttractionOfferDetailsDTO> getAttractionOfferDetails(
+            @PathVariable("offerId") Long offerId) {
+        AttractionOfferDetailsDTO offer = this.attractionOfferService.getAttractionOfferDetails(offerId);
+        return new ResponseEntity<>(offer, HttpStatus.OK);
     }
 
     @GetMapping(path = "/edit/get/{offerId}")

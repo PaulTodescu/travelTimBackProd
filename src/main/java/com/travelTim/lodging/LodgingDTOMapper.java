@@ -13,44 +13,60 @@ public class LodgingDTOMapper {
         this.modelMapper = new ModelMapper();
     }
 
-    public LodgingOfferDTO mapLodgingOfferToDTO(LodgingOfferEntity lodgingOffer){
-        return this.modelMapper.map(lodgingOffer, LodgingOfferDTO.class);
+    public LodgingOfferDTO mapLodgingOfferToDTO(LodgingOfferEntity offer){
+        return this.modelMapper.map(offer, LodgingOfferDTO.class);
     }
 
-    public LegalPersonLodgingOfferBaseDetailsDTO mapLegalLodgingOfferToBaseDetailsDTO(LegalPersonLodgingOfferEntity lodgingOffer){
-        return this.modelMapper.map(lodgingOffer, LegalPersonLodgingOfferBaseDetailsDTO.class);
+    public Set<LodgingOfferDTO> mapLodgingOffersToDTOs(Set<LodgingOfferEntity> offers){
+        return offers.stream().map(this::mapLodgingOfferToDTO).collect(Collectors.toSet());
     }
 
-    public Set<LodgingOfferDTO> mapLodgingOffersToDTOs(Set<LodgingOfferEntity> lodgingOffers){
-        return lodgingOffers.stream().map(this::mapLodgingOfferToDTO).collect(Collectors.toSet());
+    public LegalPersonLodgingOfferDTO mapLegalLodgingOfferToDTO(LegalPersonLodgingOfferEntity offer){
+        return this.modelMapper.map(offer, LegalPersonLodgingOfferDTO.class);
     }
 
-    public LegalPersonLodgingOfferDetailsDTO mapLegalLodgingOfferToLodgingDetailsDTO(LegalPersonLodgingOfferEntity lodgingOffer){
-        return this.modelMapper.map(lodgingOffer, LegalPersonLodgingOfferDetailsDTO.class);
+    public Set<LegalPersonLodgingOfferDTO> mapLegalLodgingOffersToDTOs(Set<LegalPersonLodgingOfferEntity> offers){
+        return offers.stream().map(this::mapLegalLodgingOfferToDTO).collect(Collectors.toSet());
     }
 
-    public Set<LegalPersonLodgingOfferDetailsDTO> mapLodgingOffersToLodgingDetailsDTOs(Set<LegalPersonLodgingOfferEntity> lodgingOffers){
-        return lodgingOffers.stream().map(this::mapLegalLodgingOfferToLodgingDetailsDTO).collect(Collectors.toSet());
+    public LegalPersonLodgingOfferBaseDetailsDTO mapLegalLodgingOfferToBaseDetailsDTO(LegalPersonLodgingOfferEntity offer){
+        return this.modelMapper.map(offer, LegalPersonLodgingOfferBaseDetailsDTO.class);
+    }
+
+    public LegalPersonLodgingOfferDetailsDTO mapLegalLodgingOfferToLodgingDetailsDTO(LegalPersonLodgingOfferEntity offer){
+        return this.modelMapper.map(offer, LegalPersonLodgingOfferDetailsDTO.class);
+    }
+
+    public Set<LegalPersonLodgingOfferDetailsDTO> mapLodgingOffersToLodgingDetailsDTOs(Set<LegalPersonLodgingOfferEntity> offers){
+        return offers.stream().map(this::mapLegalLodgingOfferToLodgingDetailsDTO).collect(Collectors.toSet());
     }
 
     public LodgingOfferBaseDetailsDTO mapLodgingOfferToBaseDetailsDTO(LodgingOfferEntity lodgingOffer){
         return this.modelMapper.map(lodgingOffer, LodgingOfferBaseDetailsDTO.class);
     }
 
-    public Set<LodgingOfferBaseDetailsDTO> mapLodgingOffersToBaseDetailsDTOs(Set<LodgingOfferEntity> lodgingOffers){
-        return lodgingOffers.stream().map(this::mapLodgingOfferToBaseDetailsDTO).collect(Collectors.toSet());
+    public Set<LodgingOfferBaseDetailsDTO> mapLodgingOffersToBaseDetailsDTOs(Set<LodgingOfferEntity> offers){
+        return offers.stream().map(this::mapLodgingOfferToBaseDetailsDTO).collect(Collectors.toSet());
     }
 
-    public LodgingOfferPriceDTO mapLodgingOfferToPriceDTO(LodgingOfferEntity lodgingOffer){
-        return this.modelMapper.map(lodgingOffer, LodgingOfferPriceDTO.class);
+    public LodgingOfferPriceDTO mapLodgingOfferToPriceDTO(LodgingOfferEntity offer){
+        return this.modelMapper.map(offer, LodgingOfferPriceDTO.class);
     }
 
-    public PhysicalPersonLodgingOfferEditDTO mapLodgingOfferToPhysicalPersonOfferEditDTO(LodgingOfferEntity lodgingOffer){
-        return this.modelMapper.map(lodgingOffer, PhysicalPersonLodgingOfferEditDTO.class);
+    public PhysicalPersonLodgingOfferEditDTO mapLodgingOfferToPhysicalPersonOfferEditDTO(LodgingOfferEntity offer){
+        return this.modelMapper.map(offer, PhysicalPersonLodgingOfferEditDTO.class);
     }
 
-    public LegalPersonLodgingOfferEditDTO mapLodgingOfferToLegalPersonOfferEditDTO(LodgingOfferEntity lodgingOffer){
-        return this.modelMapper.map(lodgingOffer, LegalPersonLodgingOfferEditDTO.class);
+    public LegalPersonLodgingOfferEditDTO mapLodgingOfferToLegalPersonOfferEditDTO(LodgingOfferEntity offer){
+        return this.modelMapper.map(offer, LegalPersonLodgingOfferEditDTO.class);
+    }
+
+    public PhysicalPersonLodgingOfferDTO mapPhysicalPersonLodgingOfferToDTO(PhysicalPersonLodgingOfferEntity offer){
+        return this.modelMapper.map(offer, PhysicalPersonLodgingOfferDTO.class);
+    }
+
+    public Set<PhysicalPersonLodgingOfferDTO> mapPhysicalPersonLodgingOffersToDTOs(Set<PhysicalPersonLodgingOfferEntity> offers){
+        return offers.stream().map(this::mapPhysicalPersonLodgingOfferToDTO).collect(Collectors.toSet());
     }
 
 }

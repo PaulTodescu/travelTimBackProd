@@ -1,24 +1,28 @@
 package com.travelTim.lodging;
 
+import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
-import com.travelTim.user.UserContactDTO;
+import com.travelTim.business.BusinessDetailsDTO;
+import com.travelTim.contact.OfferContactEntity;
 
 
 public class LegalPersonLodgingOfferBaseDetailsDTO {
 
     private Long id;
     private String description;
-    private UserContactDTO user;
     private BusinessEntity business;
+    private OfferContactEntity offerContact;
 
     public LegalPersonLodgingOfferBaseDetailsDTO() {
     }
 
-    public LegalPersonLodgingOfferBaseDetailsDTO(Long id, String description, UserContactDTO user, BusinessEntity business) {
+    public LegalPersonLodgingOfferBaseDetailsDTO(Long id, String description,
+                                                 BusinessEntity business,
+                                                 OfferContactEntity offerContact) {
         this.id = id;
         this.description = description;
-        this.user = user;
         this.business = business;
+        this.offerContact = offerContact;
     }
 
     public Long getId() {
@@ -37,19 +41,20 @@ public class LegalPersonLodgingOfferBaseDetailsDTO {
         this.description = description;
     }
 
-    public UserContactDTO getUser() {
-        return user;
-    }
-
-    public void setUser(UserContactDTO user) {
-        this.user = user;
-    }
-
-    public BusinessEntity getBusiness() {
-        return business;
+    public BusinessDetailsDTO getBusiness() {
+        BusinessDTOMapper mapper = new BusinessDTOMapper();
+        return mapper.mapBusinessToDetailsDTO(business);
     }
 
     public void setBusiness(BusinessEntity business) {
         this.business = business;
+    }
+
+    public OfferContactEntity getOfferContact() {
+        return offerContact;
+    }
+
+    public void setOfferContact(OfferContactEntity offerContact) {
+        this.offerContact = offerContact;
     }
 }

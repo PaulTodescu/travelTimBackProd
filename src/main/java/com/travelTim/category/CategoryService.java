@@ -70,11 +70,11 @@ public class CategoryService {
 
         // offers with price in EUR need to be converted to RON
         CurrencyConverter currencyConverter = new CurrencyConverter();
-        Float conversionRateFromEUR = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
+        //Float conversionRateFromEUR = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
         Set<LodgingOfferDTO> offers = mapper.mapLodgingOffersToDTOs(category.getLodgingOffers());
         for (LodgingOfferDTO offer: offers){
             if (offer.getCurrency() == Currency.EUR){
-                offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR));
+                //offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR));
                 offer.setCurrency(Currency.RON);
             }
             if (offer.getBusiness() != null) { // offer is of legal type
@@ -90,25 +90,25 @@ public class CategoryService {
 
                 List<LodgingOfferEntity> offersListSortedByPrice = new ArrayList<>(lodgingOffers);
 
-                offersListSortedByPrice.sort((o1, o2) -> {
-                    Float priceOffer1 = currencyConverter.getConvertedPrice(o1.getPrice(), conversionRateFromEUR);
-                    Float priceOffer2 = currencyConverter.getConvertedPrice(o2.getPrice(), conversionRateFromEUR);
-                    if (priceOffer1 < priceOffer2) {
-                        return -1;
-                    } else if (priceOffer1 > priceOffer2) {
-                        return 1;
-                    }
-                    return 0;
-                });
+//                offersListSortedByPrice.sort((o1, o2) -> {
+//                    Float priceOffer1 = currencyConverter.getConvertedPrice(o1.getPrice(), conversionRateFromEUR);
+//                    Float priceOffer2 = currencyConverter.getConvertedPrice(o2.getPrice(), conversionRateFromEUR);
+//                    if (priceOffer1 < priceOffer2) {
+//                        return -1;
+//                    } else if (priceOffer1 > priceOffer2) {
+//                        return 1;
+//                    }
+//                    return 0;
+//                });
 
                 LodgingOfferEntity cheapestOffer = offersListSortedByPrice.get(0);
                 Float cheapestOfferPrice;
                 if (cheapestOffer.getCurrency() == Currency.EUR){
-                    cheapestOfferPrice = currencyConverter.getConvertedPrice(cheapestOffer.getPrice(), conversionRateFromEUR);
+                    //cheapestOfferPrice = currencyConverter.getConvertedPrice(cheapestOffer.getPrice(), conversionRateFromEUR);
                 } else {
                     cheapestOfferPrice = cheapestOffer.getPrice();
                 }
-                offer.setPrice(cheapestOfferPrice);
+                //offer.setPrice(cheapestOfferPrice);
 
             } else { // offer is of physical type
                 offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));

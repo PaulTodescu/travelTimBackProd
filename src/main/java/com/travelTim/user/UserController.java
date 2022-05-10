@@ -2,14 +2,17 @@ package com.travelTim.user;
 
 import com.travelTim.activities.ActivityOfferBaseDetailsDTO;
 import com.travelTim.activities.ActivityOfferEntity;
+import com.travelTim.activities.ActivityOfferForBusinessPageDTO;
 import com.travelTim.attractions.AttractionOfferBaseDetailsDTO;
 import com.travelTim.attractions.AttractionOfferEntity;
+import com.travelTim.attractions.AttractionOfferForBusinessPageDTO;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.food.FoodOfferBaseDetailsDTO;
 import com.travelTim.food.FoodOfferEntity;
 import com.travelTim.lodging.LodgingOfferBaseDetailsDTO;
 import com.travelTim.lodging.LodgingOfferDTO;
 import com.travelTim.lodging.LodgingOfferEntity;
+import com.travelTim.lodging.PhysicalPersonLodgingOfferDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +71,12 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    @GetMapping(path = "/{userId}/details")
+    public ResponseEntity<UserDTO> getUserDetailsById(@PathVariable("userId") Long userId){
+        UserDTO user = userService.getUserDetailsById(userId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     @PutMapping
     public ResponseEntity<UserEntity> updateUser(@RequestBody UserEntity user){
         this.userService.updateUser(user);
@@ -82,9 +91,15 @@ public class UserController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<?> deleteUser(){
+    public ResponseEntity<Void> deleteUser(){
         this.userService.deleteUser();
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/id")
+    public ResponseEntity<Long> getLoggedInUserId(){
+        Long id = this.userService.findLoggedInUser().getId();
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     @GetMapping("/businesses")
@@ -116,5 +131,27 @@ public class UserController {
         List<ActivityOfferBaseDetailsDTO> activityOffers = this.userService.getAllActivityOffersForCurrentUser();
         return new ResponseEntity<>(activityOffers, HttpStatus.OK);
     }
+
+    @GetMapping("/{userId}/offers/lodging")
+    public ResponseEntity<List<PhysicalPersonLodgingOfferDTO>> getLodgingOffersForUserPage(
+            @PathVariable("userId") Long userId) throws IOException {
+        List<PhysicalPersonLodgingOfferDTO> lodgingOffers = this.userService.getLodgingOffersForUserPage(userId);
+        return new ResponseEntity<>(lodgingOffers, HttpStatus.OK);
+    }
+
+    @GetMapping("/{userId}/offers/attractions")
+    public ResponseEntity<List<AttractionOfferForBusinessPageDTO>> getAttractionForUserPage(
+            @PathVariable("userId") Long userId) {
+        List<AttractionOfferForBusinessPageDTO> lodgingOffers = this.userService.getAttractionOffersForUserPage(userId);
+        return new ResponseEntity<>(lodgingOffers, HttpStatus.OK);
+    }
+
+    @GetMapping("/{userId}/offers/activities")
+    public ResponseEntity<List<ActivityOfferForBusinessPageDTO>> getActivityOffersForUserPage(
+            @PathVariable("userId") Long userId) {
+        List<ActivityOfferForBusinessPageDTO> lodgingOffers = this.userService.getActivityOffersForUserPage(userId);
+        return new ResponseEntity<>(lodgingOffers, HttpStatus.OK);
+    }
+
 
 }

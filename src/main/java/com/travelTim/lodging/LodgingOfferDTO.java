@@ -22,7 +22,6 @@ public class LodgingOfferDTO {
     private Integer floor;
     private String image;
     private LocalDateTime createdAt;
-    private Integer nrLodgingOffers;
     private Float price;
     private Currency currency;
 

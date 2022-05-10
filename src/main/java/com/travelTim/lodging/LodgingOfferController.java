@@ -1,6 +1,7 @@
 package com.travelTim.lodging;
 
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.currency.Currency;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,29 @@ public class LodgingOfferController {
             @RequestBody LegalPersonLodgingOfferEntity lodgingOffer){
         Long offerId = this.lodgingOfferService.addLegalPersonLodgingOffer(lodgingOffer);
         return new ResponseEntity<>(offerId, HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/{offerId}/contact/add")
+    public ResponseEntity<Void> addOfferContact(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferContactEntity offerContact){
+        this.lodgingOfferService.addContactDetails(offerId, offerContact);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/{offerId}/contact/edit")
+    public ResponseEntity<Void> editOfferContact(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferContactEntity offerContact){
+        this.lodgingOfferService.editContactDetails(offerId, offerContact);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{offerId}/contact")
+    public ResponseEntity<OfferContactEntity> getOfferContact(
+            @PathVariable("offerId") Long offerId){
+        OfferContactEntity contact = this.lodgingOfferService.getContactDetails(offerId);
+        return new ResponseEntity<>(contact, HttpStatus.OK);
     }
 
     @GetMapping(path = "/physical/{offerId}")

@@ -3,6 +3,8 @@ package com.travelTim.food;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.category.CategoryEntity;
+import com.travelTim.contact.OfferContactEntity;
+import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.user.UserContactDTO;
 import com.travelTim.user.UserEntity;
 import org.modelmapper.ModelMapper;
@@ -47,6 +49,13 @@ public class FoodOfferEntity {
     )
     private Set<FoodMenuCategory> foodMenuCategories = new HashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "offer_contact_id")
+    private OfferContactEntity offerContact;
+
+    @ManyToMany(mappedBy = "foodOffers")
+    @JsonIgnore
+    private Set<FavouriteOffersEntity> favourites = new HashSet<>();
 
     public FoodOfferEntity() {
     }
@@ -99,6 +108,11 @@ public class FoodOfferEntity {
         this.foodMenuCategories.add(menuCategory);
     }
 
+    public void removeFoodMenuCategory(FoodMenuCategory category){
+        this.foodMenuCategories.remove(category);
+        category.getFoodOffers().remove(this);
+    }
+
     public UserContactDTO getUser() {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(this.user, UserContactDTO.class);
@@ -122,5 +136,26 @@ public class FoodOfferEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public OfferContactEntity getOfferContact() {
+        return offerContact;
+    }
+
+    public void setOfferContact(OfferContactEntity offerContact) {
+        this.offerContact = offerContact;
+    }
+
+    public Set<FavouriteOffersEntity> getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(Set<FavouriteOffersEntity> favourites) {
+        this.favourites = favourites;
+    }
+
+    @PreRemove
+    public void preRemove(){
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 }

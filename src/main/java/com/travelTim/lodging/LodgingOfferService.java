@@ -1,24 +1,27 @@
 package com.travelTim.lodging;
 
+import com.travelTim.business.BusinessEntity;
+import com.travelTim.business.BusinessService;
 import com.travelTim.category.CategoryService;
 import com.travelTim.category.CategoryType;
+import com.travelTim.contact.OfferContactDAO;
+import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.currency.Currency;
 import com.travelTim.currency.CurrencyConverter;
+import com.travelTim.favourites.FavouriteOffersEntity;
+import com.travelTim.favourites.FavouriteOffersService;
 import com.travelTim.files.ImageUtils;
 import com.travelTim.user.UserEntity;
 import com.travelTim.user.UserService;
 import com.travelTim.category.CategoryEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -28,21 +31,32 @@ public class LodgingOfferService {
     private final LegalPersonLodgingOfferDAO legalPersonLodgingOfferDAO;
     private final PhysicalPersonLodgingOfferDAO physicalPersonLodgingOfferDAO;
     private final LodgingOfferUtilityDAO lodgingOfferUtilityDAO;
+    private final OfferContactDAO offerContactDAO;
     private final UserService userService;
     private final CategoryService categoryService;
     private final ImageUtils imageUtils;
+    private final BusinessService businessService;
+    private final FavouriteOffersService favouriteOffersService;
 
     @Autowired
     public LodgingOfferService(LodgingOfferDAO lodgingOfferDAO, LegalPersonLodgingOfferDAO legalPersonLodgingOfferDAO,
-                               PhysicalPersonLodgingOfferDAO physicalPersonLodgingOfferDAO, LodgingOfferUtilityDAO lodgingOfferUtilityDAO,
-                               UserService userService, CategoryService categoryService, ImageUtils imageUtils) {
+                               PhysicalPersonLodgingOfferDAO physicalPersonLodgingOfferDAO,
+                               LodgingOfferUtilityDAO lodgingOfferUtilityDAO,
+                               OfferContactDAO offerContactDAO, UserService userService,
+                               CategoryService categoryService,
+                               ImageUtils imageUtils,
+                               @Lazy BusinessService businessService,
+                               @Lazy FavouriteOffersService favouriteOffersService) {
         this.lodgingOfferDAO = lodgingOfferDAO;
         this.legalPersonLodgingOfferDAO = legalPersonLodgingOfferDAO;
         this.physicalPersonLodgingOfferDAO = physicalPersonLodgingOfferDAO;
         this.lodgingOfferUtilityDAO = lodgingOfferUtilityDAO;
+        this.offerContactDAO = offerContactDAO;
         this.userService = userService;
         this.categoryService = categoryService;
         this.imageUtils = imageUtils;
+        this.businessService = businessService;
+        this.favouriteOffersService = favouriteOffersService;
     }
 
     public Long addPhysicalPersonLodgingOffer(PhysicalPersonLodgingOfferEntity lodgingOffer){
@@ -60,7 +74,9 @@ public class LodgingOfferService {
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.lodging);
         lodgingOffer.setCategory(category);
         this.addLodgingOfferUtilities(lodgingOffer, lodgingOffer.getUtilities());
-        return this.lodgingOfferDAO.save(lodgingOffer).getId();
+        LegalPersonLodgingOfferEntity offer = this.lodgingOfferDAO.save(lodgingOffer);
+        this.addLodgingOfferToFavouritesIfNeeded(offer, offer.getBusiness().getId());
+        return offer.getId();
     }
 
     public LodgingOfferEntity findLodgingOfferEntityById(Long lodgingOfferId){
@@ -90,7 +106,7 @@ public class LodgingOfferService {
 
     public void deleteLodgingOfferUtilities(LodgingOfferEntity offer){
         for (Iterator<LodgingOfferUtilityEntity> iterator =
-                offer.getUtilities().iterator(); iterator.hasNext();){
+             offer.getUtilities().iterator(); iterator.hasNext();){
             LodgingOfferUtilityEntity utility = iterator.next();
             utility.getLodgingOffers().remove(offer);
             if (utility.getLodgingOffers().size() == 0){
@@ -103,9 +119,9 @@ public class LodgingOfferService {
     public LegalPersonLodgingOfferBaseDetailsDTO findLegalPersonLodgingOfferById(Long offerId) {
         LegalPersonLodgingOfferEntity offer =
                 this.legalPersonLodgingOfferDAO.findLegalPersonLodgingOfferEntityById(offerId)
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Lodging offer of type legal person with id: " + offerId + " was not found")
-                );
+                        .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Lodging offer of type legal person with id: " + offerId + " was not found")
+                        );
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         return mapper.mapLegalLodgingOfferToBaseDetailsDTO(offer);
     }
@@ -113,11 +129,37 @@ public class LodgingOfferService {
     public LegalPersonLodgingOfferEditDTO findLegalPersonLodgingOfferForEdit(Long offerId) {
         LodgingOfferEntity offer =
                 this.legalPersonLodgingOfferDAO.findLegalPersonLodgingOfferEntityById(offerId)
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Lodging offer of type legal person with id: " + offerId + " was not found")
-                );
+                        .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Lodging offer of type legal person with id: " + offerId + " was not found")
+                        );
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         return mapper.mapLodgingOfferToLegalPersonOfferEditDTO(offer);
+    }
+
+    // if the user already added offers from same business,
+    // then add new offers to favourites as well
+    public void addLodgingOfferToFavouritesIfNeeded(
+            LegalPersonLodgingOfferEntity offer, Long businessId){
+        BusinessEntity business = this.businessService.findBusinessById(businessId);
+        List<UserEntity> users = this.userService.findAllUsers();
+        for (UserEntity user: users){
+            if (checkIfUserAddedAnyOfferFromBusinessToFavourites(user, business.getLodgingOffers())) {
+                // check if user has any legal offer to favourites
+                if (!user.getFavourites().getLodgingOffers().contains(offer)) {
+                    this.favouriteOffersService.addLodgingOfferToFavourites(user.getId(), offer);
+                }
+            }
+        }
+    }
+
+    public boolean checkIfUserAddedAnyOfferFromBusinessToFavourites(
+            UserEntity user, Set<LegalPersonLodgingOfferEntity> offers){
+        for (LegalPersonLodgingOfferEntity offer: offers){
+            if (user.getFavourites().getLodgingOffers().contains(offer)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public LodgingOfferEntity findPhysicalPersonLodgingOfferById(Long offerId) {
@@ -126,18 +168,19 @@ public class LodgingOfferService {
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Lodging offer of type physical person with id: " + offerId +
                                 " was not found")
-        );
+                );
         if (offer.getCurrency() == Currency.EUR){
-           // try {
-                //CurrencyConverter currencyConverter = new CurrencyConverter();
-                //Float conversionRateFromEUR = currencyConverter
-                //        .getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
-                //offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR));
-                offer.setCurrency(Currency.RON);
-//            } catch (IOException ioException) {
+             try {
+            CurrencyConverter currencyConverter = new CurrencyConverter();
+            //Float conversionRateFromEUR = currencyConverter
+            //        .getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
+            offer.setPrice(currencyConverter.getConvertedPrice(offer.getPrice(), 1F));
+            offer.setCurrency(Currency.RON);
+            } catch (Exception e) {}
+             //catch (IOException ioException) {
 //                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
 //                        "Could not retrieve currency for monetary conversion");
-//            }
+ //           }
         }
         return offer;
     }
@@ -149,6 +192,52 @@ public class LodgingOfferService {
                 );
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         return mapper.mapLodgingOfferToPhysicalPersonOfferEditDTO(offer);
+    }
+
+    public void addContactDetails(Long offerId, OfferContactEntity offerContact){
+        LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
+        this.setContactDetails(offer, offerContact);
+    }
+
+    public void editContactDetails(Long offerId, OfferContactEntity offerContact){
+        LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
+        OfferContactEntity initialOfferContact = offer.getOfferContact();
+        if (!initialOfferContact.equals(offerContact)) {
+            this.deleteOfferContact(offer, initialOfferContact);
+        }
+        this.setContactDetails(offer, offerContact);
+    }
+
+    public void setContactDetails(LodgingOfferEntity offer, OfferContactEntity offerContact){
+        Optional<OfferContactEntity> contactOptional = this.offerContactDAO
+                .findOfferContactEntityByEmailAndPhoneNumber(
+                        offerContact.getEmail(),
+                        offerContact.getPhoneNumber());
+        if (contactOptional.isPresent()) {
+            offer.setOfferContact(contactOptional.get());
+        } else {
+            offer.setOfferContact(this.offerContactDAO.save(offerContact));
+        }
+        this.lodgingOfferDAO.save(offer);
+    }
+
+    public OfferContactEntity getContactDetails(Long offerId) {
+        LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
+        return offer.getOfferContact();
+    }
+
+    public void deleteOfferContact(LodgingOfferEntity offer, OfferContactEntity offerContact) {
+        if (offerContact != null) {
+            offer.setOfferContact(null);
+            offerContact.getLodgingOffers().remove(offer);
+            if (offerContact.getLodgingOffers().size() == 0 &&
+                    offerContact.getFoodOffers().size() == 0 &&
+                    offerContact.getAttractionOffers().size() == 0 &&
+                    offerContact.getActivityOffers().size() == 0) {
+                this.offerContactDAO.deleteOfferContactEntityById(offerContact.getId());
+            }
+            this.lodgingOfferDAO.save(offer);
+        }
     }
 
     public void editLegalPersonLodgingOffer(LegalPersonLodgingOfferEditDTO offerToSave,
@@ -173,7 +262,7 @@ public class LodgingOfferService {
     }
 
     public void editPhysicalPersonLodgingOffer(PhysicalPersonLodgingOfferEditDTO offerToSave,
-                                            Long offerId){
+                                               Long offerId){
         PhysicalPersonLodgingOfferEntity offer =
                 this.physicalPersonLodgingOfferDAO.findPhysicalPersonLodgingOfferEntityById(offerId)
                         .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -195,9 +284,20 @@ public class LodgingOfferService {
         this.lodgingOfferDAO.save(offer);
     }
 
+    public void removeLodgingOfferFromFavorites(LodgingOfferEntity offer){
+        for (Iterator<FavouriteOffersEntity> iterator = offer.getFavourites().iterator(); iterator.hasNext();){
+            FavouriteOffersEntity favourites = iterator.next();
+            favourites.getLodgingOffers().remove(offer);
+            iterator.remove();
+        }
+        this.lodgingOfferDAO.save(offer);
+    }
+
     public void deleteLodgingOffer(Long offerId) {
         LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
         this.deleteLodgingOfferUtilities(offer);
+        this.deleteOfferContact(offer, offer.getOfferContact());
+        this.removeLodgingOfferFromFavorites(offer);
         this.imageUtils.deleteOfferImages("lodging", offerId);
         this.lodgingOfferDAO.deleteLodgingOfferEntityById(offerId);
     }

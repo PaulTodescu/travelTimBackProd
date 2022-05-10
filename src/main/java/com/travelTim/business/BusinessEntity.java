@@ -30,8 +30,11 @@ public class BusinessEntity {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
-    private String cui;
+    private String email;
+    private String phoneNumber;
+    private String websiteLink;
+    private String facebookLink;
+    private String twitterLink;
 
     @ManyToOne
     @JoinColumn(columnDefinition = "user_id")
@@ -65,11 +68,17 @@ public class BusinessEntity {
     public BusinessEntity() {
     }
 
-    public BusinessEntity(String name, City city, String address, String cui, UserEntity user) {
+    public BusinessEntity(String name, City city, String address, String email,
+                          String phoneNumber, String websiteLink, String facebookLink,
+                          String twitterLink, UserEntity user) {
         this.name = name;
         this.city = city;
         this.address = address;
-        this.cui = cui;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.websiteLink = websiteLink;
+        this.facebookLink = facebookLink;
+        this.twitterLink = twitterLink;
         this.user = user;
     }
 
@@ -105,12 +114,44 @@ public class BusinessEntity {
         this.address = address;
     }
 
-    public String getCui() {
-        return cui;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCui(String cui) {
-        this.cui = cui;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getWebsiteLink() {
+        return websiteLink;
+    }
+
+    public void setWebsiteLink(String websiteLink) {
+        this.websiteLink = websiteLink;
+    }
+
+    public String getFacebookLink() {
+        return facebookLink;
+    }
+
+    public void setFacebookLink(String facebookLink) {
+        this.facebookLink = facebookLink;
+    }
+
+    public String getTwitterLink() {
+        return twitterLink;
+    }
+
+    public void setTwitterLink(String twitterLink) {
+        this.twitterLink = twitterLink;
     }
 
     public Set<LegalPersonLodgingOfferEntity> getLodgingOffers() {
@@ -160,10 +201,14 @@ public class BusinessEntity {
                         "Friday","Saturday","Sunday")
                                 .indexOf(daySchedule.getDay().toString())))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-
     }
 
     public void setSchedule(Set<BusinessDaySchedule> schedule) {
         this.schedule = schedule;
+    }
+
+    public void removeSchedule(BusinessDaySchedule daySchedule){
+        this.schedule.remove(daySchedule);
+        daySchedule.getBusinesses().remove(this);
     }
 }

@@ -2,11 +2,14 @@ package com.travelTim.lodging;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.travelTim.category.CategoryEntity;
+import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.currency.Currency;
+import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.user.UserContactDTO;
 import com.travelTim.user.UserDTOMapper;
 import com.travelTim.user.UserDetailsDTO;
 import com.travelTim.user.UserEntity;
+import org.hibernate.annotations.Cascade;
 import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
@@ -66,6 +69,14 @@ public abstract class LodgingOfferEntity {
 
     )
     private Set<LodgingOfferUtilityEntity> utilities = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "offer_contact_id")
+    private OfferContactEntity offerContact;
+
+    @ManyToMany(mappedBy = "lodgingOffers")
+    @JsonIgnore
+    private Set<FavouriteOffersEntity> favourites = new HashSet<>();
 
     public LodgingOfferEntity() {
     }
@@ -166,6 +177,12 @@ public abstract class LodgingOfferEntity {
 
     public void addUtility(LodgingOfferUtilityEntity utility) {
         this.utilities.add(utility);
+        utility.getLodgingOffers().add(this);
+    }
+
+    public void removeUtility(LodgingOfferUtilityEntity utility) {
+        this.utilities.remove(utility);
+        utility.getLodgingOffers().remove(this);
     }
 
     public UserDetailsDTO getUser() {
@@ -193,4 +210,19 @@ public abstract class LodgingOfferEntity {
         this.createdAt = createdAt;
     }
 
+    public OfferContactEntity getOfferContact() {
+        return offerContact;
+    }
+
+    public void setOfferContact(OfferContactEntity offerContact) {
+        this.offerContact = offerContact;
+    }
+
+    public Set<FavouriteOffersEntity> getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(Set<FavouriteOffersEntity> favourites) {
+        this.favourites = favourites;
+    }
 }

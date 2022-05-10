@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -50,6 +51,19 @@ public class LodgingOfferUtilityEntity {
 
     public void setLodgingOffers(Set<LodgingOfferEntity> lodgingOffers) {
         this.lodgingOffers = lodgingOffers;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LodgingOfferUtilityEntity utility = (LodgingOfferUtilityEntity) o;
+        return id.equals(utility.id) && name.equals(utility.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 
     @Override

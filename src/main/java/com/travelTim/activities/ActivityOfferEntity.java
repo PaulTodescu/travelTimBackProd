@@ -3,6 +3,8 @@ package com.travelTim.activities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.category.CategoryEntity;
+import com.travelTim.contact.OfferContactEntity;
+import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.location.City;
 import com.travelTim.ticket.TicketEntity;
 import com.travelTim.user.UserContactDTO;
@@ -60,6 +62,14 @@ public class ActivityOfferEntity {
             inverseJoinColumns = { @JoinColumn(name = "ticket_id")}
     )
     private Set<TicketEntity> tickets = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "offer_contact_id")
+    private OfferContactEntity offerContact;
+
+    @ManyToMany(mappedBy = "activityOffers")
+    @JsonIgnore
+    private Set<FavouriteOffersEntity> favourites = new HashSet<>();
 
     public ActivityOfferEntity() {
     }
@@ -148,6 +158,11 @@ public class ActivityOfferEntity {
         this.tickets = tickets;
     }
 
+    public void removeTicket(TicketEntity ticket){
+        this.tickets.remove(ticket);
+        ticket.getActivityOffers().remove(this);
+    }
+
     public CategoryEntity getCategory() {
         return category;
     }
@@ -164,4 +179,19 @@ public class ActivityOfferEntity {
         this.createdAt = createdAt;
     }
 
+    public OfferContactEntity getOfferContact() {
+        return offerContact;
+    }
+
+    public void setOfferContact(OfferContactEntity offerContact) {
+        this.offerContact = offerContact;
+    }
+
+    public Set<FavouriteOffersEntity> getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(Set<FavouriteOffersEntity> favourites) {
+        this.favourites = favourites;
+    }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/currency")
+@RequestMapping(path = "/currency")
 public class CurrencyController {
 
     @GetMapping(path = "/conversion/rate")
@@ -18,8 +18,8 @@ public class CurrencyController {
             @RequestParam(value = "fromCode") Currency fromCode,
             @RequestParam(value = "toCode") Currency toCode) throws IOException {
         CurrencyConverter currencyConverter = new CurrencyConverter();
-        Float conversionRate = currencyConverter.getCurrencyConversionRate(fromCode.name(), toCode.name());
-        return new ResponseEntity<>(conversionRate, HttpStatus.OK);
+        //Float conversionRate = currencyConverter.getCurrencyConversionRate(fromCode.name(), toCode.name());
+        return new ResponseEntity<>(1F, HttpStatus.OK);
     }
 
 }

@@ -70,4 +70,8 @@ public class FoodMenuCategory {
         this.foodMenuItems = foodMenuItems;
     }
 
+    public void removeFoodMenuItem(FoodMenuItem item){
+        this.foodMenuItems.remove(item);
+        item.getFoodMenuCategories().remove(this);
+    }
 }

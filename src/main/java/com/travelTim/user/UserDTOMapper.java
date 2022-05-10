@@ -10,6 +10,10 @@ public class UserDTOMapper {
         this.modelMapper = new ModelMapper();
     }
 
+    public UserDTO mapUserToDTO(UserEntity user){
+        return this.modelMapper.map(user, UserDTO.class);
+    }
+
     public UserContactDTO mapUserToUserContactDetailsDTO(UserEntity userEntity){
         return this.modelMapper.map(userEntity, UserContactDTO.class);
     }

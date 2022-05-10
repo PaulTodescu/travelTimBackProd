@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.travelTim.activities.ActivityOfferEntity;
 import com.travelTim.attractions.AttractionOfferEntity;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.food.FoodOfferEntity;
 import com.travelTim.lodging.LodgingOfferEntity;
+import com.travelTim.lodging.PhysicalPersonLodgingOfferEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -57,6 +60,11 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<ActivityOfferEntity> activityOffers = new HashSet<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(columnDefinition = "favourites_id")
+    @JsonIgnore
+    private FavouriteOffersEntity favourites;
 
     public UserEntity() {
     }
@@ -139,6 +147,14 @@ public class UserEntity implements Serializable {
         return lodgingOffers;
     }
 
+    @JsonIgnore
+    public Set<PhysicalPersonLodgingOfferEntity> getPhysicalPersonLodgingOffers(){
+        return this.lodgingOffers.stream()
+                .filter(offer -> offer instanceof PhysicalPersonLodgingOfferEntity)
+                .map(offer -> (PhysicalPersonLodgingOfferEntity) offer)
+                .collect(Collectors.toSet());
+    }
+
     public void setLodgingOffers(Set<LodgingOfferEntity> lodgingOffers) {
         this.lodgingOffers = lodgingOffers;
     }
@@ -165,5 +181,13 @@ public class UserEntity implements Serializable {
 
     public void setActivityOffers(Set<ActivityOfferEntity> activityOffers) {
         this.activityOffers = activityOffers;
+    }
+
+    public FavouriteOffersEntity getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(FavouriteOffersEntity favourites) {
+        this.favourites = favourites;
     }
 }

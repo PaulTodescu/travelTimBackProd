@@ -3,6 +3,8 @@ package com.travelTim.attractions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.category.CategoryEntity;
+import com.travelTim.contact.OfferContactEntity;
+import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.location.City;
 import com.travelTim.ticket.TicketEntity;
 import com.travelTim.user.UserContactDTO;
@@ -61,10 +63,19 @@ public class AttractionOfferEntity {
     )
     private Set<TicketEntity> tickets = new HashSet<>();
 
+    @ManyToOne
+    @JoinColumn(name = "offer_contact_id")
+    private OfferContactEntity offerContact;
+
+    @ManyToMany(mappedBy = "attractionOffers")
+    @JsonIgnore
+    private Set<FavouriteOffersEntity> favourites = new HashSet<>();
+
     public AttractionOfferEntity() {
     }
 
-    public AttractionOfferEntity(String title, String address, City city, String description, Set<TicketEntity> tickets) {
+    public AttractionOfferEntity(String title, String address, City city, String description,
+                                 Set<TicketEntity> tickets) {
         this.title = title;
         this.address = address;
         this.city = city;
@@ -122,14 +133,14 @@ public class AttractionOfferEntity {
         this.description = description;
     }
 
-    public UserDetailsDTO getUser() {
-        UserDTOMapper mapper = new UserDTOMapper();
-        return mapper.mapUserToUserDetailsDTO(this.user);
+    public UserEntity getUser() {
+        return user;
     }
 
     public void setUser(UserEntity user) {
         this.user = user;
     }
+
     public BusinessEntity getBusiness() {
         return business;
     }
@@ -171,5 +182,21 @@ public class AttractionOfferEntity {
     public void removeTicket(TicketEntity ticket){
         this.tickets.remove(ticket);
         ticket.getAttractionOffers().remove(this);
+    }
+
+    public OfferContactEntity getOfferContact() {
+        return offerContact;
+    }
+
+    public void setOfferContact(OfferContactEntity offerContact) {
+        this.offerContact = offerContact;
+    }
+
+    public Set<FavouriteOffersEntity> getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(Set<FavouriteOffersEntity> favourites) {
+        this.favourites = favourites;
     }
 }
