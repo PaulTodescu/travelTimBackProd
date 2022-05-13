@@ -1,5 +1,6 @@
 package com.travelTim.lodging;
 
+import com.travelTim.business.BusinessDaySchedule;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.business.BusinessService;
 import com.travelTim.category.CategoryService;
@@ -134,6 +135,17 @@ public class LodgingOfferService {
                         );
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         return mapper.mapLodgingOfferToLegalPersonOfferEditDTO(offer);
+    }
+
+//    public LodgingOfferDetailsDTO getLodgingOfferDetails(Long offerId){
+//        LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
+//        LodgingDTOMapper mapper = new LodgingDTOMapper();
+//        return mapper.mapLodgingOfferToDetailsDTO(offer);
+//    }
+
+    public Set<BusinessDaySchedule> getBusinessScheduleForLegalLodgingOffer(Long offerId) {
+        LegalPersonLodgingOfferEntity offer = (LegalPersonLodgingOfferEntity) this.findLodgingOfferEntityById(offerId);
+        return offer.getBusiness().getSchedule();
     }
 
     // if the user already added offers from same business,

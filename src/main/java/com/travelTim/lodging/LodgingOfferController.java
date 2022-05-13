@@ -1,5 +1,6 @@
 package com.travelTim.lodging;
 
+import com.travelTim.business.BusinessDaySchedule;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.currency.Currency;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/lodging")
@@ -35,6 +37,20 @@ public class LodgingOfferController {
             @RequestBody LegalPersonLodgingOfferEntity lodgingOffer){
         Long offerId = this.lodgingOfferService.addLegalPersonLodgingOffer(lodgingOffer);
         return new ResponseEntity<>(offerId, HttpStatus.CREATED);
+    }
+
+//    @GetMapping(path = "/{offerId}/details")
+//    public ResponseEntity<LodgingOfferDetailsDTO> getLodgingOfferDetails(
+//            @PathVariable("offerId") Long offerId){
+//        LodgingOfferDetailsDTO offer = this.lodgingOfferService.getLodgingOfferDetails(offerId);
+//        return new ResponseEntity<>(offer, HttpStatus.OK);
+//    }
+
+    @GetMapping(path = "/legal/{offerId}/business/schedule")
+    public ResponseEntity<Set<BusinessDaySchedule>> getBusinessScheduleForLegalLodgingOffer(
+            @PathVariable("offerId") Long offerId){
+        Set<BusinessDaySchedule> schedule = this.lodgingOfferService.getBusinessScheduleForLegalLodgingOffer(offerId);
+        return new ResponseEntity<>(schedule, HttpStatus.OK);
     }
 
     @PutMapping(path = "/{offerId}/contact/add")

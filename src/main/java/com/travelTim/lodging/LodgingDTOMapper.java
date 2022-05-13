@@ -69,4 +69,8 @@ public class LodgingDTOMapper {
         return offers.stream().map(this::mapPhysicalPersonLodgingOfferToDTO).collect(Collectors.toSet());
     }
 
+//    public LodgingOfferDetailsDTO mapLodgingOfferToDetailsDTO(LodgingOfferEntity offer){
+//        return this.modelMapper.map(offer, LodgingOfferDetailsDTO.class);
+//    }
+
 }
