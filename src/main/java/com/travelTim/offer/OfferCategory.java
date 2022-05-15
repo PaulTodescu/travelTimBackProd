@@ -1,4 +1,4 @@
-package com.travelTim.favourites;
+package com.travelTim.offer;
 
 public enum OfferCategory {
     lodging,

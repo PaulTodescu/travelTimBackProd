@@ -4,6 +4,7 @@ import com.travelTim.business.BusinessDaySchedule;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.currency.Currency;
+import com.travelTim.offer.OfferStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -122,8 +123,16 @@ public class LodgingOfferController {
     }
 
     @DeleteMapping(path = "/{offerId}")
-    public ResponseEntity<?> deleteLodgingOffer(@PathVariable("offerId") Long offerId){
+    public ResponseEntity<Void> deleteLodgingOffer(@PathVariable("offerId") Long offerId){
         this.lodgingOfferService.deleteLodgingOffer(offerId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/{offerId}/status/change")
+    public ResponseEntity<Void> changeLodgingOfferStatus(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferStatus status){
+        this.lodgingOfferService.changeLodgingOfferStatus(offerId, status);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -3,19 +3,22 @@ package com.travelTim.food;
 import com.travelTim.business.BusinessDTO;
 import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.offer.OfferStatus;
 
 public class FoodOfferBaseDetailsDTO {
     private Long id;
     private BusinessEntity business;
+    private OfferStatus status;
     private String image;
     private String createdAt;
 
     public FoodOfferBaseDetailsDTO() {
     }
 
-    public FoodOfferBaseDetailsDTO(Long id, BusinessEntity business, String createdAt) {
+    public FoodOfferBaseDetailsDTO(Long id, BusinessEntity business, OfferStatus status, String createdAt) {
         this.id = id;
         this.business = business;
+        this.status = status;
     }
 
     public Long getId() {
@@ -33,6 +36,14 @@ public class FoodOfferBaseDetailsDTO {
 
     public void setBusiness(BusinessEntity business) {
         this.business = business;
+    }
+
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
     }
 
     public String getImage() {

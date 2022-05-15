@@ -8,6 +8,7 @@ import com.travelTim.contact.OfferContactDAO;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.files.ImageUtils;
+import com.travelTim.offer.OfferStatus;
 import com.travelTim.ticket.TicketDAO;
 import com.travelTim.ticket.TicketEntity;
 import com.travelTim.user.UserEntity;
@@ -49,6 +50,7 @@ public class ActivityOfferService {
     public Long addActivityOffer(ActivityOfferEntity activityOffer) {
         UserEntity loggedInUser = this.userService.findLoggedInUser();
         activityOffer.setUser(loggedInUser);
+        activityOffer.setStatus(OfferStatus.active);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.activities);
         activityOffer.setCategory(category);
         this.addActivityOfferTickets(activityOffer, activityOffer.getTickets());
@@ -182,5 +184,11 @@ public class ActivityOfferService {
         this.removeActivityOfferFromFavorites(offer);
         this.imageUtils.deleteOfferImages("activities", offerId);
         this.activityOfferDAO.deleteActivityOfferEntityById(offerId);
+    }
+
+    public void changeActivityOfferStatus(Long offerId, OfferStatus status) {
+        ActivityOfferEntity offer = this.findActivityOfferById(offerId);
+        offer.setStatus(status);
+        this.activityOfferDAO.save(offer);
     }
 }

@@ -1,15 +1,12 @@
 package com.travelTim.attractions;
 
 import com.travelTim.contact.OfferContactEntity;
-import com.travelTim.ticket.TicketEntity;
+import com.travelTim.offer.OfferStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.transaction.Transactional;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/attraction")
@@ -83,6 +80,14 @@ public class AttractionOfferController {
             @PathVariable("offerId") Long offerId,
             @RequestBody AttractionOfferEditDTO offerToSave){
         this.attractionOfferService.editAttractionOffer(offerId, offerToSave);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/{offerId}/status/change")
+    public ResponseEntity<Void> changeAttractionOfferStatus(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferStatus status){
+        this.attractionOfferService.changeAttractionOfferStatus(offerId, status);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

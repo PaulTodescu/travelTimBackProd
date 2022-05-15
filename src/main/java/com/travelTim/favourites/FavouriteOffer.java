@@ -1,6 +1,7 @@
 package com.travelTim.favourites;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.travelTim.offer.OfferCategory;
 
 import java.time.LocalDateTime;
 

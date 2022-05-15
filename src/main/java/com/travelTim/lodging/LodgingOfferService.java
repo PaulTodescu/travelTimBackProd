@@ -12,6 +12,7 @@ import com.travelTim.currency.CurrencyConverter;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.favourites.FavouriteOffersService;
 import com.travelTim.files.ImageUtils;
+import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserEntity;
 import com.travelTim.user.UserService;
 import com.travelTim.category.CategoryEntity;
@@ -65,6 +66,7 @@ public class LodgingOfferService {
         lodgingOffer.setUser(loggedInUser);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.lodging);
         lodgingOffer.setCategory(category);
+        lodgingOffer.setStatus(OfferStatus.active);
         this.addLodgingOfferUtilities(lodgingOffer, lodgingOffer.getUtilities());
         return this.lodgingOfferDAO.save(lodgingOffer).getId();
     }
@@ -74,6 +76,7 @@ public class LodgingOfferService {
         lodgingOffer.setUser(loggedInUser);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.lodging);
         lodgingOffer.setCategory(category);
+        lodgingOffer.setStatus(OfferStatus.active);
         this.addLodgingOfferUtilities(lodgingOffer, lodgingOffer.getUtilities());
         LegalPersonLodgingOfferEntity offer = this.lodgingOfferDAO.save(lodgingOffer);
         this.addLodgingOfferToFavouritesIfNeeded(offer, offer.getBusiness().getId());
@@ -312,6 +315,12 @@ public class LodgingOfferService {
         this.removeLodgingOfferFromFavorites(offer);
         this.imageUtils.deleteOfferImages("lodging", offerId);
         this.lodgingOfferDAO.deleteLodgingOfferEntityById(offerId);
+    }
+
+    public void changeLodgingOfferStatus(Long offerId, OfferStatus status) {
+        LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
+        offer.setStatus(status);
+        this.lodgingOfferDAO.save(offer);
     }
 
 }

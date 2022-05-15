@@ -5,6 +5,7 @@ import com.travelTim.business.BusinessEntity;
 import com.travelTim.category.CategoryEntity;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
+import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserContactDTO;
 import com.travelTim.user.UserEntity;
 import org.modelmapper.ModelMapper;
@@ -24,6 +25,10 @@ public class FoodOfferEntity {
 
     @Column(nullable = false)
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OfferStatus status;
 
     @ManyToOne
     @JoinColumn(columnDefinition = "user_id")
@@ -154,8 +159,11 @@ public class FoodOfferEntity {
         this.favourites = favourites;
     }
 
-    @PreRemove
-    public void preRemove(){
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
     }
 }

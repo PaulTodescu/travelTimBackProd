@@ -7,6 +7,7 @@ import com.travelTim.contact.OfferContactDAO;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.files.ImageUtils;
+import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserEntity;
 import com.travelTim.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ public class FoodOfferService {
     public Long addFoodOffer(FoodOfferEntity foodOffer) {
         UserEntity loggedInUser = this.userService.findLoggedInUser();
         foodOffer.setUser(loggedInUser);
+        foodOffer.setStatus(OfferStatus.active);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.food);
         foodOffer.setCategory(category);
         try {
@@ -190,5 +192,11 @@ public class FoodOfferService {
         this.removeFoodOfferFromFavorites(offer);
         this.imageUtils.deleteOfferImages("food", offerId);
         this.foodOfferDAO.deleteFoodOfferEntityById(offerId);
+    }
+
+    public void changeFoodOfferStatus(Long offerId, OfferStatus status) {
+        FoodOfferEntity offer = this.findFoodOfferById(offerId);
+        offer.setStatus(status);
+        this.foodOfferDAO.save(offer);
     }
 }

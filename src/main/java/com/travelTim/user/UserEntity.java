@@ -8,6 +8,7 @@ import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.food.FoodOfferEntity;
 import com.travelTim.lodging.LodgingOfferEntity;
 import com.travelTim.lodging.PhysicalPersonLodgingOfferEntity;
+import com.travelTim.reservation.OfferReservation;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -65,6 +66,10 @@ public class UserEntity implements Serializable {
     @JoinColumn(columnDefinition = "favourites_id")
     @JsonIgnore
     private FavouriteOffersEntity favourites;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<OfferReservation> reservations = new HashSet<>();
 
     public UserEntity() {
     }
@@ -189,5 +194,13 @@ public class UserEntity implements Serializable {
 
     public void setFavourites(FavouriteOffersEntity favourites) {
         this.favourites = favourites;
+    }
+
+    public Set<OfferReservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(Set<OfferReservation> reservations) {
+        this.reservations = reservations;
     }
 }

@@ -4,6 +4,7 @@ import com.travelTim.business.BusinessDTO;
 import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.location.City;
+import com.travelTim.offer.OfferStatus;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ public class AttractionOfferBaseDetailsDTO {
     private String title;
     private String address;
     private City city;
+    private OfferStatus status;
     private BusinessDTO business;
     private LocalDateTime createdAt;
     private String image;
@@ -20,12 +22,13 @@ public class AttractionOfferBaseDetailsDTO {
     public AttractionOfferBaseDetailsDTO() {
     }
 
-    public AttractionOfferBaseDetailsDTO(Long id, String title, String address,
-                                         City city, BusinessDTO business, LocalDateTime createdAt) {
+    public AttractionOfferBaseDetailsDTO(Long id, String title, String address, City city,
+                                         OfferStatus status, BusinessDTO business, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.address = address;
         this.city = city;
+        this.status = status;
         this.business = business;
         this.createdAt = createdAt;
     }
@@ -60,6 +63,14 @@ public class AttractionOfferBaseDetailsDTO {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
     }
 
     public BusinessDTO getBusiness() {

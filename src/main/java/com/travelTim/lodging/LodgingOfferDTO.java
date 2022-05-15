@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.currency.Currency;
 import com.travelTim.location.City;
+import com.travelTim.offer.OfferStatus;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LodgingOfferDTO {
@@ -24,12 +26,13 @@ public class LodgingOfferDTO {
     private LocalDateTime createdAt;
     private Float price;
     private Currency currency;
+    private OfferStatus status;
 
     public LodgingOfferDTO() {
     }
 
     public LodgingOfferDTO(Long id, BusinessEntity business, String title, String address, City city,
-                           Integer nrRooms, Integer nrSingleBeds, Integer nrDoubleBeds,
+                           Integer nrRooms, Integer nrSingleBeds, Integer nrDoubleBeds, OfferStatus status,
                            Integer floor,LocalDateTime createdAt, Float price, Currency currency) {
         this.id = id;
         this.business = business;
@@ -39,6 +42,7 @@ public class LodgingOfferDTO {
         this.nrRooms = nrRooms;
         this.nrSingleBeds = nrSingleBeds;
         this.nrDoubleBeds = nrDoubleBeds;
+        this.status = status;
         this.floor = floor;
         this.createdAt = createdAt;
         this.price = price;
@@ -127,7 +131,9 @@ public class LodgingOfferDTO {
 
     public Integer getNrLodgingOffers() {
         if (this.business != null) {
-            return this.business.getLodgingOffers().size();
+            return this.business.getLodgingOffers().stream()
+                    .filter(offer -> offer.getStatus() == OfferStatus.active)
+                    .collect(Collectors.toSet()).size();
         }
         return null;
     }
@@ -154,6 +160,14 @@ public class LodgingOfferDTO {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
     }
 
     @Override

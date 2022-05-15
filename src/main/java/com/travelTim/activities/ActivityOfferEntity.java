@@ -6,6 +6,7 @@ import com.travelTim.category.CategoryEntity;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.location.City;
+import com.travelTim.offer.OfferStatus;
 import com.travelTim.ticket.TicketEntity;
 import com.travelTim.user.UserContactDTO;
 import com.travelTim.user.UserDTOMapper;
@@ -38,6 +39,10 @@ public class ActivityOfferEntity {
 
     @Column(nullable = false)
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OfferStatus status;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -129,6 +134,14 @@ public class ActivityOfferEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
     }
 
     public UserDetailsDTO getUser() {

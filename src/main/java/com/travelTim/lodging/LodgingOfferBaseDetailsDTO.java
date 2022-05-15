@@ -6,6 +6,7 @@ import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.currency.Currency;
 import com.travelTim.location.City;
+import com.travelTim.offer.OfferStatus;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +25,7 @@ public class LodgingOfferBaseDetailsDTO {
     private Integer nrRooms;
     private Integer nrSingleBeds;
     private Integer nrDoubleBeds;
+    private OfferStatus status;
 
     public LodgingOfferBaseDetailsDTO() {
     }
@@ -31,7 +33,7 @@ public class LodgingOfferBaseDetailsDTO {
     public LodgingOfferBaseDetailsDTO(Long id, BusinessEntity business, String title, String address,
                                       City city, LocalDateTime createdAt, Float price,
                                       Currency currency, Integer nrRooms, Integer nrSingleBeds,
-                                      Integer nrDoubleBeds) {
+                                      Integer nrDoubleBeds, OfferStatus status) {
         this.id = id;
         this.business = business;
         this.title = title;
@@ -43,6 +45,7 @@ public class LodgingOfferBaseDetailsDTO {
         this.nrRooms = nrRooms;
         this.nrSingleBeds = nrSingleBeds;
         this.nrDoubleBeds = nrDoubleBeds;
+        this.status = status;
     }
 
     public Long getId() {
@@ -143,5 +146,13 @@ public class LodgingOfferBaseDetailsDTO {
 
     public void setNrDoubleBeds(Integer nrDoubleBeds) {
         this.nrDoubleBeds = nrDoubleBeds;
+    }
+
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
     }
 }

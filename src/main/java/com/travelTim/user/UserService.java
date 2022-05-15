@@ -162,11 +162,11 @@ public class UserService {
                 this.lodgingOfferService.deleteLodgingOffer(offer.getId());
             }
         }
-        if (user.getFoodOffers().size() > 0){
-            for (FoodOfferEntity offer: user.getFoodOffers()){
-                this.foodOfferService.deleteFoodOffer(offer.getId());
-            }
-        }
+//        if (user.getFoodOffers().size() > 0){
+//            for (FoodOfferEntity offer: user.getFoodOffers()){
+//                this.foodOfferService.deleteFoodOffer(offer.getId());
+//            }
+//        }
         if (user.getAttractionOffers().size() > 0){
             for (AttractionOfferEntity offer: user.getAttractionOffers()){
                 this.attractionOfferService.deleteAttractionOffer(offer.getId());

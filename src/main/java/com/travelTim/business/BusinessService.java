@@ -15,6 +15,7 @@ import com.travelTim.food.FoodOfferIdMenuImageDTO;
 import com.travelTim.food.FoodOfferService;
 import com.travelTim.location.City;
 import com.travelTim.lodging.*;
+import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserEntity;
 import com.travelTim.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,8 +178,10 @@ public class BusinessService {
     public List<LegalPersonLodgingOfferDetailsDTO> getLegalLodgingOffers(Long businessId) throws IOException {
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         BusinessEntity business = this.findBusinessById(businessId);
+        Set<LegalPersonLodgingOfferEntity> activeOffers = business.getLodgingOffers().stream()
+                .filter(offer -> offer.getStatus() == OfferStatus.active).collect(Collectors.toSet());
         Set<LegalPersonLodgingOfferDetailsDTO> offers =
-                mapper.mapLodgingOffersToLodgingDetailsDTOs(business.getLodgingOffers());
+                mapper.mapLodgingOffersToLodgingDetailsDTOs(activeOffers);
         // convert offer prices to RON
         try {
              CurrencyConverter currencyConverter = new CurrencyConverter();
@@ -210,8 +213,11 @@ public class BusinessService {
     public List<LegalPersonLodgingOfferDTO> getLodgingOffersForBusinessPage(Long businessId) throws IOException {
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         BusinessEntity business = this.findBusinessById(businessId);
+        Set<LegalPersonLodgingOfferEntity> activeOffers = business.getLodgingOffers().stream()
+                .filter(offer -> offer.getStatus() == OfferStatus.active)
+                .collect(Collectors.toSet());
         Set<LegalPersonLodgingOfferDTO> offers =
-                mapper.mapLegalLodgingOffersToDTOs(business.getLodgingOffers());
+                mapper.mapLegalLodgingOffersToDTOs(activeOffers);
         // convert offer prices to RON
         try {
             CurrencyConverter currencyConverter = new CurrencyConverter();
@@ -236,18 +242,23 @@ public class BusinessService {
         BusinessEntity business = this.findBusinessById(businessId);
         FoodDTOMapper mapper = new FoodDTOMapper();
         if (business.getFoodOffer() != null) {
-            FoodOfferIdMenuImageDTO offer = mapper.mapFoodOfferToIdMenuImageDTO(business.getFoodOffer());
-            offer.setImage(this.imageService.getOfferFrontImage("food", business.getFoodOffer().getId()));
-            return offer;
+            if (business.getFoodOffer().getStatus() == OfferStatus.active) {
+                FoodOfferIdMenuImageDTO offer = mapper.mapFoodOfferToIdMenuImageDTO(business.getFoodOffer());
+                offer.setImage(this.imageService.getOfferFrontImage("food", business.getFoodOffer().getId()));
+                return offer;
+            }
         }
         return null;
     }
 
     public List<AttractionOfferForBusinessPageDTO> getAttractionOffers(Long businessId){
         BusinessEntity business = this.findBusinessById(businessId);
+        Set<AttractionOfferEntity> activeOffers = business.getAttractionOffers().stream()
+                .filter(offer -> offer.getStatus() == OfferStatus.active)
+                .collect(Collectors.toSet());
         AttractionDTOMapper mapper = new AttractionDTOMapper();
         Set<AttractionOfferForBusinessPageDTO> offers =
-                mapper.mapAttractionOffersForBusinessPageDTO(business.getAttractionOffers());
+                mapper.mapAttractionOffersForBusinessPageDTO(activeOffers);
         for (AttractionOfferForBusinessPageDTO offer: offers) {
             offer.setImage(this.imageService.getOfferFrontImage("attractions", offer.getId()));
         }
@@ -258,9 +269,12 @@ public class BusinessService {
 
     public List<ActivityOfferForBusinessPageDTO> getActivityOffers(Long businessId){
         BusinessEntity business = this.findBusinessById(businessId);
+        Set<ActivityOfferEntity> activeOffers = business.getActivityOffers().stream()
+                .filter(offer -> offer.getStatus() == OfferStatus.active)
+                .collect(Collectors.toSet());
         ActivityDTOMapper mapper = new ActivityDTOMapper();
         Set<ActivityOfferForBusinessPageDTO> offers =
-                mapper.mapActivityOffersForBusinessPageDTO(business.getActivityOffers());
+                mapper.mapActivityOffersForBusinessPageDTO(activeOffers);
         for (ActivityOfferForBusinessPageDTO offer: offers) {
             offer.setImage(this.imageService.getOfferFrontImage("activities", offer.getId()));
         }

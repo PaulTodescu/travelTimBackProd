@@ -1,5 +1,7 @@
 package com.travelTim.favourites;
 
+import com.travelTim.offer.OfferCategory;
+
 public class FavouriteOfferCategoryId {
 
     private Long id;

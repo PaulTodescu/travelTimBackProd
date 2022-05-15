@@ -5,12 +5,11 @@ import com.travelTim.category.CategoryEntity;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.currency.Currency;
 import com.travelTim.favourites.FavouriteOffersEntity;
-import com.travelTim.user.UserContactDTO;
+import com.travelTim.offer.OfferStatus;
+import com.travelTim.reservation.OfferReservation;
 import com.travelTim.user.UserDTOMapper;
 import com.travelTim.user.UserDetailsDTO;
 import com.travelTim.user.UserEntity;
-import org.hibernate.annotations.Cascade;
-import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -49,6 +48,10 @@ public abstract class LodgingOfferEntity {
 
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OfferStatus status;
+
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -77,6 +80,11 @@ public abstract class LodgingOfferEntity {
     @ManyToMany(mappedBy = "lodgingOffers")
     @JsonIgnore
     private Set<FavouriteOffersEntity> favourites = new HashSet<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(columnDefinition = "offer_reservation_id")
+    @JsonIgnore
+    private OfferReservation reservation;
 
     public LodgingOfferEntity() {
     }
@@ -167,6 +175,14 @@ public abstract class LodgingOfferEntity {
         this.description = description;
     }
 
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
+    }
+
     public Set<LodgingOfferUtilityEntity> getUtilities() {
         return utilities;
     }
@@ -224,5 +240,13 @@ public abstract class LodgingOfferEntity {
 
     public void setFavourites(Set<FavouriteOffersEntity> favourites) {
         this.favourites = favourites;
+    }
+
+    public OfferReservation getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(OfferReservation reservation) {
+        this.reservation = reservation;
     }
 }

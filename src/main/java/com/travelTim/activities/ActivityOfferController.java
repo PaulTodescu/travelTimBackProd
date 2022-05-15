@@ -1,6 +1,7 @@
 package com.travelTim.activities;
 
 import com.travelTim.contact.OfferContactEntity;
+import com.travelTim.offer.OfferStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,5 +84,11 @@ public class ActivityOfferController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
+    @PutMapping(path = "/{offerId}/status/change")
+    public ResponseEntity<Void> changeActivityOfferStatus(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferStatus status){
+        this.activityOfferService.changeActivityOfferStatus(offerId, status);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

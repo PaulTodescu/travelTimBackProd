@@ -1,5 +1,6 @@
 package com.travelTim.favourites;
 
+import com.travelTim.offer.OfferCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

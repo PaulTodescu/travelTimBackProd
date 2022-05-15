@@ -1,6 +1,7 @@
 package com.travelTim.food;
 
 import com.travelTim.contact.OfferContactEntity;
+import com.travelTim.offer.OfferStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -93,4 +94,11 @@ public class FoodOfferController {
         return new ResponseEntity<>(offer, HttpStatus.OK);
     }
 
+    @PutMapping(path = "/{offerId}/status/change")
+    public ResponseEntity<Void> changeFoodOfferStatus(
+            @PathVariable("offerId") Long offerId,
+            @RequestBody OfferStatus status){
+        this.foodOfferService.changeFoodOfferStatus(offerId, status);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

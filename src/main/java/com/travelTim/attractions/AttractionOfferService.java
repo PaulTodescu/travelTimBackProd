@@ -7,7 +7,7 @@ import com.travelTim.contact.OfferContactDAO;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.files.ImageUtils;
-import com.travelTim.food.FoodOfferEntity;
+import com.travelTim.offer.OfferStatus;
 import com.travelTim.ticket.TicketDAO;
 import com.travelTim.ticket.TicketEntity;
 import com.travelTim.user.UserEntity;
@@ -46,6 +46,7 @@ public class AttractionOfferService {
     public Long addAttractionOffer(AttractionOfferEntity attractionOffer){
         UserEntity loggedInUser = this.userService.findLoggedInUser();
         attractionOffer.setUser(loggedInUser);
+        attractionOffer.setStatus(OfferStatus.active);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.attractions);
         attractionOffer.setCategory(category);
         this.addAttractionOfferTickets(attractionOffer, attractionOffer.getTickets());
@@ -175,5 +176,11 @@ public class AttractionOfferService {
             }
             iterator.remove();
         }
+    }
+
+    public void changeAttractionOfferStatus(Long offerId, OfferStatus status) {
+        AttractionOfferEntity offer = this.findAttractionOfferById(offerId);
+        offer.setStatus(status);
+        this.attractionOfferDAO.save(offer);
     }
 }
