@@ -64,7 +64,7 @@ public class ActivityOfferController {
     }
 
     @DeleteMapping(path = "/{offerId}")
-    public ResponseEntity<?> deleteActivityOffer(@PathVariable("offerId") Long offerId){
+    public ResponseEntity<Void> deleteActivityOffer(@PathVariable("offerId") Long offerId){
         this.activityOfferService.deleteActivityOffer(offerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

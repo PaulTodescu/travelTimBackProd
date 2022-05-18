@@ -1,5 +1,6 @@
 package com.travelTim.lodging;
 
+import com.travelTim.business.BusinessEntity;
 import com.travelTim.currency.Currency;
 
 import java.util.Set;
@@ -14,6 +15,8 @@ public class LegalPersonLodgingOfferDetailsDTO {
     private Float price;
     private Currency currency;
     private String description;
+    private BusinessEntity business;
+    private String address;
     private Set<LodgingOfferUtilityEntity> utilities;
 
     public LegalPersonLodgingOfferDetailsDTO() {
@@ -21,7 +24,8 @@ public class LegalPersonLodgingOfferDetailsDTO {
 
     public LegalPersonLodgingOfferDetailsDTO(Long id, Integer nrRooms, Integer nrBathrooms, Integer nrSingleBeds,
                                              Integer nrDoubleBeds, Integer floor, Float price, Currency currency,
-                                             String description, Set<LodgingOfferUtilityEntity> utilities) {
+                                             String description, BusinessEntity business,
+                                             Set<LodgingOfferUtilityEntity> utilities) {
         this.id = id;
         this.nrRooms = nrRooms;
         this.nrBathrooms = nrBathrooms;
@@ -31,6 +35,7 @@ public class LegalPersonLodgingOfferDetailsDTO {
         this.price = price;
         this.currency = currency;
         this.description = description;
+        this.business = business;
         this.utilities = utilities;
     }
 
@@ -104,6 +109,14 @@ public class LegalPersonLodgingOfferDetailsDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAddress() {
+        return business.getAddress() + ", " + business.getCity();
+    }
+
+    public void setBusiness(BusinessEntity business) {
+        this.business = business;
     }
 
     public Set<LodgingOfferUtilityEntity> getUtilities() {

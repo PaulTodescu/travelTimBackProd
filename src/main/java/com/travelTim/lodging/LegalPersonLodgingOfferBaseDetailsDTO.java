@@ -41,9 +41,8 @@ public class LegalPersonLodgingOfferBaseDetailsDTO {
         this.description = description;
     }
 
-    public BusinessDetailsDTO getBusiness() {
-        BusinessDTOMapper mapper = new BusinessDTOMapper();
-        return mapper.mapBusinessToDetailsDTO(business);
+    public BusinessEntity getBusiness() {
+        return business;
     }
 
     public void setBusiness(BusinessEntity business) {

@@ -6,7 +6,7 @@ import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.currency.Currency;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.offer.OfferStatus;
-import com.travelTim.reservation.OfferReservation;
+import com.travelTim.reservation.OfferReservationEntity;
 import com.travelTim.user.UserDTOMapper;
 import com.travelTim.user.UserDetailsDTO;
 import com.travelTim.user.UserEntity;
@@ -84,7 +84,7 @@ public abstract class LodgingOfferEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(columnDefinition = "offer_reservation_id")
     @JsonIgnore
-    private OfferReservation reservation;
+    private OfferReservationEntity reservation;
 
     public LodgingOfferEntity() {
     }
@@ -242,11 +242,11 @@ public abstract class LodgingOfferEntity {
         this.favourites = favourites;
     }
 
-    public OfferReservation getReservation() {
+    public OfferReservationEntity getReservation() {
         return reservation;
     }
 
-    public void setReservation(OfferReservation reservation) {
+    public void setReservation(OfferReservationEntity reservation) {
         this.reservation = reservation;
     }
 }

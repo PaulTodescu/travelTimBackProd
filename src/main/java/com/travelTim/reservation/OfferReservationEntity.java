@@ -6,10 +6,11 @@ import com.travelTim.lodging.LodgingOfferEntity;
 import com.travelTim.user.UserEntity;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "offer_reservation")
-public class OfferReservation {
+public class OfferReservationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,7 +39,14 @@ public class OfferReservation {
     private Long totalPrice;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Currency currency;
+
+    @Column(nullable = false)
+    private Integer nrNights;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(columnDefinition = "user_id")
@@ -49,11 +57,12 @@ public class OfferReservation {
     @JsonIgnore
     private LodgingOfferEntity lodgingOffer;
 
-    public OfferReservation() {
+    public OfferReservationEntity() {
     }
 
-    public OfferReservation(String arrivalDate, String arrivalTime, String departureDate, String firstName,
-                            String lastName, String email, String phoneNumber, Long totalPrice, Currency currency) {
+    public OfferReservationEntity(String arrivalDate, String arrivalTime, String departureDate, String firstName,
+                                  String lastName, String email, String phoneNumber, Long totalPrice,
+                                  Currency currency, Integer nrNights) {
         this.arrivalDate = arrivalDate;
         this.arrivalTime = arrivalTime;
         this.departureDate = departureDate;
@@ -63,6 +72,7 @@ public class OfferReservation {
         this.phoneNumber = phoneNumber;
         this.totalPrice = totalPrice;
         this.currency = currency;
+        this.nrNights = nrNights;
     }
 
     public Long getId() {
@@ -143,6 +153,22 @@ public class OfferReservation {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public Integer getNrNights() {
+        return nrNights;
+    }
+
+    public void setNrNights(Integer nrNights) {
+        this.nrNights = nrNights;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public UserEntity getUser() {
