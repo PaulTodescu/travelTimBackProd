@@ -4,6 +4,7 @@ import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.business.BusinessDetailsDTO;
 import com.travelTim.contact.OfferContactEntity;
+import com.travelTim.offer.OfferStatus;
 
 
 public class LegalPersonLodgingOfferBaseDetailsDTO {
@@ -16,8 +17,7 @@ public class LegalPersonLodgingOfferBaseDetailsDTO {
     public LegalPersonLodgingOfferBaseDetailsDTO() {
     }
 
-    public LegalPersonLodgingOfferBaseDetailsDTO(Long id, String description,
-                                                 BusinessEntity business,
+    public LegalPersonLodgingOfferBaseDetailsDTO(Long id, String description, BusinessEntity business,
                                                  OfferContactEntity offerContact) {
         this.id = id;
         this.description = description;
@@ -56,4 +56,5 @@ public class LegalPersonLodgingOfferBaseDetailsDTO {
     public void setOfferContact(OfferContactEntity offerContact) {
         this.offerContact = offerContact;
     }
+
 }

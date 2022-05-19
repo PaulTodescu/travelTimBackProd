@@ -136,4 +136,5 @@ public class LodgingOfferController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
 }

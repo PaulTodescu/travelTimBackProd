@@ -69,8 +69,12 @@ public class LodgingDTOMapper {
         return offers.stream().map(this::mapPhysicalPersonLodgingOfferToDTO).collect(Collectors.toSet());
     }
 
-    public LodgingOfferForReservationDetailsDTO mapLodgingOfferToReservationDetailsDTO(LodgingOfferEntity offer){
-        return this.modelMapper.map(offer, LodgingOfferForReservationDetailsDTO.class);
+//    public LodgingOfferForReservationDetailsDTO mapLodgingOfferToReservationDetailsDTO(LodgingOfferEntity offer){
+//        return this.modelMapper.map(offer, LodgingOfferForReservationDetailsDTO.class);
+//    }
+
+    public LodgingOfferDetailsForReservationDTO mapLodgingOfferToReservationDetailsDTO(LodgingOfferEntity offer){
+        return this.modelMapper.map(offer, LodgingOfferDetailsForReservationDTO.class);
     }
 
 }

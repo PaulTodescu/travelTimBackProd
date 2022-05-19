@@ -1,10 +1,12 @@
 package com.travelTim.reservation;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class OfferReservationDTOMapper {
 
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
     public OfferReservationDTOMapper() {
         this.mapper = new ModelMapper();

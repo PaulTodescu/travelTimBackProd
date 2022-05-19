@@ -1,5 +1,6 @@
 package com.travelTim.reservation;
 
+import com.travelTim.lodging.LodgingOfferDetailsForReservationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,13 @@ public class OfferReservationController {
             @PathVariable("reservationId") Long reservationId) {
         OfferReservationDetailsDTO reservation = this.reservationService.getReservationDetails(reservationId);
         return new ResponseEntity<>(reservation, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{reservationId}/offer/details")
+    public ResponseEntity<LodgingOfferDetailsForReservationDTO> getLodgingOfferDetailsForReservation(
+            @PathVariable("reservationId") Long reservationId){
+        LodgingOfferDetailsForReservationDTO offerDetails = this.reservationService.getLodgingOfferDetailsForReservation(reservationId);
+        return new ResponseEntity<>(offerDetails, HttpStatus.OK);
     }
 
 }

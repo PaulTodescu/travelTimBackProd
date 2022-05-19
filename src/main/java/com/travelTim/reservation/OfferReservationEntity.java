@@ -2,7 +2,7 @@ package com.travelTim.reservation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.travelTim.currency.Currency;
-import com.travelTim.lodging.LodgingOfferEntity;
+import com.travelTim.location.City;
 import com.travelTim.user.UserEntity;
 
 import javax.persistence.*;
@@ -36,7 +36,7 @@ public class OfferReservationEntity {
     private String phoneNumber;
 
     @Column(nullable = false)
-    private Long totalPrice;
+    private Float totalPrice;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -48,20 +48,49 @@ public class OfferReservationEntity {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(nullable = false)
+    private Integer nrRooms;
+
+    @Column(nullable = false)
+    private Integer nrBathrooms;
+
+    @Column(nullable = false)
+    private Integer nrSingleBeds;
+
+    @Column(nullable = false)
+    private Integer nrDoubleBeds;
+
+    @Column(nullable = false)
+    private Integer floor;
+
+    @Column(nullable = false)
+    private String providerName;
+
+    @Column(nullable = false)
+    private String providerEmail;
+
+    private String providerPhone;
+
+    @Column(nullable = false)
+    private String offerTitle;
+
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
+    private City city;
+
     @ManyToOne
     @JoinColumn(columnDefinition = "user_id")
     @JsonIgnore
     private UserEntity user;
 
-    @OneToOne(mappedBy = "reservation")
-    @JsonIgnore
-    private LodgingOfferEntity lodgingOffer;
 
     public OfferReservationEntity() {
     }
 
     public OfferReservationEntity(String arrivalDate, String arrivalTime, String departureDate, String firstName,
-                                  String lastName, String email, String phoneNumber, Long totalPrice,
+                                  String lastName, String email, String phoneNumber, Float totalPrice,
                                   Currency currency, Integer nrNights) {
         this.arrivalDate = arrivalDate;
         this.arrivalTime = arrivalTime;
@@ -139,11 +168,11 @@ public class OfferReservationEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public Long getTotalPrice() {
+    public Float getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Long totalPrice) {
+    public void setTotalPrice(Float totalPrice) {
         this.totalPrice = totalPrice;
     }
 
@@ -171,20 +200,100 @@ public class OfferReservationEntity {
         this.createdAt = createdAt;
     }
 
+    public Integer getNrRooms() {
+        return nrRooms;
+    }
+
+    public void setNrRooms(Integer nrRooms) {
+        this.nrRooms = nrRooms;
+    }
+
+    public Integer getNrBathrooms() {
+        return nrBathrooms;
+    }
+
+    public void setNrBathrooms(Integer nrBathrooms) {
+        this.nrBathrooms = nrBathrooms;
+    }
+
+    public Integer getNrSingleBeds() {
+        return nrSingleBeds;
+    }
+
+    public void setNrSingleBeds(Integer nrSingleBeds) {
+        this.nrSingleBeds = nrSingleBeds;
+    }
+
+    public Integer getNrDoubleBeds() {
+        return nrDoubleBeds;
+    }
+
+    public void setNrDoubleBeds(Integer nrDoubleBeds) {
+        this.nrDoubleBeds = nrDoubleBeds;
+    }
+
+    public Integer getFloor() {
+        return floor;
+    }
+
+    public void setFloor(Integer floor) {
+        this.floor = floor;
+    }
+
+    public String getProviderName() {
+        return providerName;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
+    }
+
+    public String getProviderEmail() {
+        return providerEmail;
+    }
+
+    public void setProviderEmail(String providerEmail) {
+        this.providerEmail = providerEmail;
+    }
+
+    public String getProviderPhone() {
+        return providerPhone;
+    }
+
+    public void setProviderPhone(String providerPhone) {
+        this.providerPhone = providerPhone;
+    }
+
+    public String getOfferTitle() {
+        return offerTitle;
+    }
+
+    public void setOfferTitle(String title) {
+        this.offerTitle = title;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
     public UserEntity getUser() {
         return user;
     }
 
     public void setUser(UserEntity user) {
         this.user = user;
-    }
-
-    public LodgingOfferEntity getLodgingOffer() {
-        return lodgingOffer;
-    }
-
-    public void setLodgingOffer(LodgingOfferEntity lodgingOffer) {
-        this.lodgingOffer = lodgingOffer;
     }
 
 

@@ -1,11 +1,8 @@
 package com.travelTim.reservation;
 
+import com.travelTim.business.BusinessEntity;
 import com.travelTim.email.EmailService;
-import com.travelTim.location.City;
-import com.travelTim.lodging.LegalPersonLodgingOfferEntity;
-import com.travelTim.lodging.LodgingOfferEntity;
-import com.travelTim.lodging.LodgingOfferService;
-import com.travelTim.lodging.PhysicalPersonLodgingOfferEntity;
+import com.travelTim.lodging.*;
 import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserEntity;
 import com.travelTim.user.UserService;
@@ -53,20 +50,12 @@ public class OfferReservationService {
         }
         user.getReservations().add(reservation);
         reservation.setUser(user);
-        offer.setReservation(reservation);
         offer.setStatus(OfferStatus.reserved);
-        reservation.setLodgingOffer(offer);
 
-        String providerName;
-        String providerPhone;
         String reservationPhoneNumber;
+        String providerPhoneNumber;
         String arrivalTime;
 
-        if (offer.getOfferContact().getPhoneNumber() == null || offer.getOfferContact().getPhoneNumber().length() == 0){
-            providerPhone = "Not Provided";
-        } else {
-            providerPhone = offer.getOfferContact().getPhoneNumber();
-        }
         if (reservation.getPhoneNumber() == null || reservation.getPhoneNumber().length() == 0){
             reservationPhoneNumber = "Not Provided";
         } else {
@@ -77,21 +66,10 @@ public class OfferReservationService {
         } else {
             arrivalTime = reservation.getArrivalTime();
         }
-
-        String title;
-        String address;
-        City city;
-
-        if (offer instanceof LegalPersonLodgingOfferEntity){
-            providerName = ((LegalPersonLodgingOfferEntity) offer).getBusiness().getName();
-            title = ((LegalPersonLodgingOfferEntity) offer).getBusiness().getName();
-            address = ((LegalPersonLodgingOfferEntity) offer).getBusiness().getAddress();
-            city = ((LegalPersonLodgingOfferEntity) offer).getBusiness().getCity();
+        if (reservation.getProviderPhone() == null || reservation.getProviderPhone().length() == 0){
+            providerPhoneNumber = "Not Provided";
         } else {
-            providerName = offer.getUser().getLastName() + " " + offer.getUser().getFirstName();
-            title = ((PhysicalPersonLodgingOfferEntity) offer).getTitle();
-            address = ((PhysicalPersonLodgingOfferEntity) offer).getAddress();
-            city = ((PhysicalPersonLodgingOfferEntity) offer).getCity();
+            providerPhoneNumber = reservation.getProviderPhone();
         }
 
         try {
@@ -155,39 +133,35 @@ public class OfferReservationService {
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Rooms</th>\n" +
-                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrRooms() + "</td>\n" +
+                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrRooms() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Bathrooms</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrBathrooms() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrBathrooms() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Single Beds</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrSingleBeds() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrSingleBeds() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Double Beds</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrDoubleBeds() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrDoubleBeds() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Floor</th>\n" +
-                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getFloor() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getFloor() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none; background-color: #e1e2e3;\">\n" +
-                            "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Address</th>\n" +
+                            "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Location</th>\n" +
                             "       <td></td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Address</th>\n" +
-                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + address + "</td>\n" +
+                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getAddress() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">City</th>\n" +
-                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + city + "</td>\n" +
-                            "       </tr>\n" +
-                            "       <tr style=\"border: none; background-color: #e1e2e3;\">\n" +
-                            "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Provider Contact</th>\n" +
-                            "       <td></td>\n" +
+                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getCity() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none; background-color: #e1e2e3;\">\n" +
                             "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Provider Contact</th>\n" +
@@ -195,15 +169,19 @@ public class OfferReservationService {
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Name</th>\n" +
-                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + providerName + "</td>\n" +
+                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getProviderName() + "</td>\n" +
+                            "       </tr>\n" +
+                            "       <tr style=\"border: none;\">\n" +
+                            "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Email</th>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getProviderEmail() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Phone</th>\n" +
-                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + providerPhone + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + providerPhoneNumber + "</td>\n" +
                             "       </tr>\n" +
                             "   </table>\n" +
                             "</div>");
-            this.emailService.sendEmail(offer.getOfferContact().getEmail(), "TravelTim - New Reservation Received",
+            this.emailService.sendEmail(reservation.getProviderEmail(), "TravelTim - New Reservation Received",
                     "<div style=\"background-color: #034953; padding: 10px; margin-bottom: 20px; border-radius: 7px\">\n" +
                             "   <h1 style=\"color: #ffffff; font-weight: bold; font-family: Trebuchet MS\">\n" +
                             "       TravelTim\n" +
@@ -211,7 +189,7 @@ public class OfferReservationService {
                             "</div>  \n" +
                             "<div style=\"text-align: center\">\n" +
                             "   <h2 style=\"margin: 30px 15px; font-family: Helvetica, sans-serif; color: #000000\">\n" +
-                            "       Hi " + offer.getUser().getFirstName() + ", you received a new reservation for <span style=\"color: #7c795d;\">" + title + "</span>!\n" +
+                            "       Hi " + reservation.getUser().getFirstName() + ", you received a new reservation for <span style=\"color: #7c795d;\">" + reservation.getOfferTitle() + "</span>!\n" +
                             "   </h2>\n" +
                             "</div>\n" +
                             "<div style=\"text-align: center; font-family: Bahnschrift\">\n" +
@@ -263,35 +241,35 @@ public class OfferReservationService {
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Rooms</th>\n" +
-                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrRooms() + "</td>\n" +
+                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrRooms() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Bathrooms</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrBathrooms() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrBathrooms() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Single Beds</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrSingleBeds() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrSingleBeds() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Nr. Double Beds</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getNrDoubleBeds() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getNrDoubleBeds() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Floor</th>\n" +
-                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getFloor() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getFloor() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none; background-color: #e1e2e3;\">\n" +
-                            "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Address</th>\n" +
+                            "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Location</th>\n" +
                             "       <td></td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Address</th>\n" +
-                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + address + "</td>\n" +
+                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getAddress() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">City</th>\n" +
-                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + city + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getCity() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none; background-color: #e1e2e3;\">\n" +
                             "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Provider Contact</th>\n" +
@@ -299,15 +277,15 @@ public class OfferReservationService {
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Name</th>\n" +
-                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + providerName + "</td>\n" +
+                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getProviderName() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Email</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + offer.getOfferContact().getEmail() + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getProviderEmail() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none;\">\n" +
                             "       <th style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Phone</th>\n" +
-                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + providerPhone + "</td>\n" +
+                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + providerPhoneNumber + "</td>\n" +
                             "       </tr>\n" +
                             "   </table>\n" +
                             "</div>");
@@ -332,11 +310,7 @@ public class OfferReservationService {
             OfferReservationDTO reservationDTO = new OfferReservationDTO();
             reservationDTO.setId(reservation.getId());
             reservationDTO.setDate(this.getFormattedDate(reservation.getCreatedAt()));
-            if (reservation.getLodgingOffer() instanceof LegalPersonLodgingOfferEntity) {
-                reservationDTO.setTitle(((LegalPersonLodgingOfferEntity) reservation.getLodgingOffer()).getBusiness().getName());
-            } else {
-                reservationDTO.setTitle(((PhysicalPersonLodgingOfferEntity)reservation.getLodgingOffer()).getTitle());
-            }
+            reservationDTO.setTitle(reservation.getOfferTitle());
             reservationDTOs.add(reservationDTO);
         }
         return reservationDTOs.stream()
@@ -353,16 +327,37 @@ public class OfferReservationService {
     public OfferReservationDetailsDTO getReservationDetails(Long reservationId) {
         OfferReservationEntity reservation = this.findReservationById(reservationId);
         OfferReservationDTOMapper mapper = new OfferReservationDTOMapper();
-        return mapper.mapReservationToDetailsDTO(reservation);
+        OfferReservationDetailsDTO reservationDetails = mapper.mapReservationToDetailsDTO(reservation);
+        reservationDetails.setCreatedAt(this.getFormattedDate(reservation.getCreatedAt()));
+        return reservationDetails;
     }
 
     public void deleteReservation(Long reservationId) {
         OfferReservationEntity reservation = this.findReservationById(reservationId);
-        reservation.getLodgingOffer().setReservation(null);
-        reservation.setLodgingOffer(null);
         reservation.getUser().getReservations().remove(reservation);
         reservation.setUser(null);
         this.offerReservationDAO.deleteOfferReservationEntityById(reservationId);
+    }
+
+    public LodgingOfferDetailsForReservationDTO getLodgingOfferDetailsForReservation(Long offerId) {
+        LodgingOfferEntity offer = this.lodgingService.findLodgingOfferEntityById(offerId);
+        LodgingDTOMapper mapper = new LodgingDTOMapper();
+        LodgingOfferDetailsForReservationDTO offerDetails = mapper.mapLodgingOfferToReservationDetailsDTO(offer);
+        offerDetails.setProviderEmail(offer.getOfferContact().getEmail());
+        offerDetails.setProviderPhone(offer.getOfferContact().getPhoneNumber());
+        if (offer instanceof LegalPersonLodgingOfferEntity) {
+            BusinessEntity offerBusiness = ((LegalPersonLodgingOfferEntity) offer).getBusiness();
+            offerDetails.setProviderName(offerBusiness.getName());
+            offerDetails.setOfferTitle(offerBusiness.getName());
+            offerDetails.setAddress(offerBusiness.getAddress());
+            offerDetails.setCity(offerBusiness.getCity());
+        } else {
+            offerDetails.setProviderName(offer.getUser().getLastName() + " " + offer.getUser().getFirstName());
+            offerDetails.setOfferTitle(((PhysicalPersonLodgingOfferEntity) offer).getTitle());
+            offerDetails.setAddress(((PhysicalPersonLodgingOfferEntity) offer).getAddress());
+            offerDetails.setCity(((PhysicalPersonLodgingOfferEntity) offer).getCity());
+        }
+        return offerDetails;
     }
 
 }

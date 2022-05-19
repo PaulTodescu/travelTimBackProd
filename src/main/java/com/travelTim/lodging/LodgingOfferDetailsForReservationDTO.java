@@ -1,22 +1,15 @@
-package com.travelTim.reservation;
+package com.travelTim.lodging;
 
 import com.travelTim.currency.Currency;
 import com.travelTim.location.City;
 
-public class OfferReservationDetailsDTO {
+import java.util.Set;
+
+public class LodgingOfferDetailsForReservationDTO {
 
     private Long id;
-    private String createdAt;
-    private String arrivalDate;
-    private String arrivalTime;
-    private String departureDate;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phoneNumber;
-    private Float totalPrice;
+    private Float price;
     private Currency currency;
-    private Integer nrNights;
     private Integer nrRooms;
     private Integer nrBathrooms;
     private Integer nrSingleBeds;
@@ -28,27 +21,19 @@ public class OfferReservationDetailsDTO {
     private String offerTitle;
     private String address;
     private City city;
+    private Set<LodgingOfferUtilityEntity> utilities;
 
-    public OfferReservationDetailsDTO() {
+    public LodgingOfferDetailsForReservationDTO() {
     }
 
-    public OfferReservationDetailsDTO(Long id, String arrivalDate, String arrivalTime, String departureDate,
-                                      String firstName, String lastName, String email, String phoneNumber,
-                                      Float totalPrice, Currency currency, Integer nrNights, Integer nrRooms,
-                                      Integer nrBathrooms, Integer nrSingleBeds, Integer nrDoubleBeds,
-                                      Integer floor, String providerName, String providerEmail, String providerPhone,
-                                      String offerTitle, String address, City city) {
+    public LodgingOfferDetailsForReservationDTO(Long id, Float price, Currency currency, Integer nrRooms,
+                                                Integer nrBathrooms, Integer nrSingleBeds, Integer nrDoubleBeds,
+                                                Integer floor, String providerName, String providerEmail,
+                                                String providerPhone, String offerTitle, String address,
+                                                City city, Set<LodgingOfferUtilityEntity> utilities) {
         this.id = id;
-        this.arrivalDate = arrivalDate;
-        this.arrivalTime = arrivalTime;
-        this.departureDate = departureDate;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.totalPrice = totalPrice;
+        this.price = price;
         this.currency = currency;
-        this.nrNights = nrNights;
         this.nrRooms = nrRooms;
         this.nrBathrooms = nrBathrooms;
         this.nrSingleBeds = nrSingleBeds;
@@ -60,6 +45,7 @@ public class OfferReservationDetailsDTO {
         this.offerTitle = offerTitle;
         this.address = address;
         this.city = city;
+        this.utilities = utilities;
     }
 
     public Long getId() {
@@ -70,76 +56,12 @@ public class OfferReservationDetailsDTO {
         this.id = id;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public Float getPrice() {
+        return price;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getArrivalDate() {
-        return arrivalDate;
-    }
-
-    public void setArrivalDate(String arrivalDate) {
-        this.arrivalDate = arrivalDate;
-    }
-
-    public String getArrivalTime() {
-        return arrivalTime;
-    }
-
-    public void setArrivalTime(String arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
-
-    public String getDepartureDate() {
-        return departureDate;
-    }
-
-    public void setDepartureDate(String departureDate) {
-        this.departureDate = departureDate;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Float getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(Float totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setPrice(Float price) {
+        this.price = price;
     }
 
     public Currency getCurrency() {
@@ -148,14 +70,6 @@ public class OfferReservationDetailsDTO {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
-    }
-
-    public Integer getNrNights() {
-        return nrNights;
-    }
-
-    public void setNrNights(Integer nrNights) {
-        this.nrNights = nrNights;
     }
 
     public Integer getNrRooms() {
@@ -244,5 +158,13 @@ public class OfferReservationDetailsDTO {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public Set<LodgingOfferUtilityEntity> getUtilities() {
+        return utilities;
+    }
+
+    public void setUtilities(Set<LodgingOfferUtilityEntity> utilities) {
+        this.utilities = utilities;
     }
 }

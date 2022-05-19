@@ -81,11 +81,6 @@ public abstract class LodgingOfferEntity {
     @JsonIgnore
     private Set<FavouriteOffersEntity> favourites = new HashSet<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(columnDefinition = "offer_reservation_id")
-    @JsonIgnore
-    private OfferReservationEntity reservation;
-
     public LodgingOfferEntity() {
     }
 
@@ -242,11 +237,4 @@ public abstract class LodgingOfferEntity {
         this.favourites = favourites;
     }
 
-    public OfferReservationEntity getReservation() {
-        return reservation;
-    }
-
-    public void setReservation(OfferReservationEntity reservation) {
-        this.reservation = reservation;
-    }
 }

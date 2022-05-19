@@ -3,6 +3,7 @@ package com.travelTim.food;
 import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessDetailsDTO;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.offer.OfferStatus;
 
 import java.util.Set;
 
@@ -11,16 +12,18 @@ public class FoodOfferDetailsDTO {
     private String description;
     private BusinessEntity business;
     private Set<FoodMenuCategory> foodMenuCategories;
+    private OfferStatus status;
 
     public FoodOfferDetailsDTO() {
     }
 
     public FoodOfferDetailsDTO(Long id, String description, BusinessEntity business,
-                               Set<FoodMenuCategory> foodMenuCategories) {
+                               Set<FoodMenuCategory> foodMenuCategories, OfferStatus status) {
         this.id = id;
         this.description = description;
         this.business = business;
         this.foodMenuCategories = foodMenuCategories;
+        this.status = status;
     }
 
     public Long getId() {
@@ -54,5 +57,13 @@ public class FoodOfferDetailsDTO {
 
     public void setFoodMenuCategories(Set<FoodMenuCategory> foodMenuCategories) {
         this.foodMenuCategories = foodMenuCategories;
+    }
+
+    public OfferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OfferStatus status) {
+        this.status = status;
     }
 }
