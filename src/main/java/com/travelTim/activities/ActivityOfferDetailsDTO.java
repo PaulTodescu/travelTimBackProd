@@ -24,6 +24,7 @@ public class ActivityOfferDetailsDTO {
     private City city;
     private String description;
     private OfferStatus status;
+    private Long nrViews;
     private BusinessEntity business;
     private Set<TicketEntity> tickets;
     private OfferContactEntity offerContact;
@@ -33,9 +34,9 @@ public class ActivityOfferDetailsDTO {
     }
 
     public ActivityOfferDetailsDTO(Long id, String title, String address, City city,
-                                   String description, OfferStatus status, BusinessEntity business,
-                                   Set<TicketEntity> tickets, OfferContactEntity offerContact,
-                                   UserEntity user) {
+                                   String description, OfferStatus status,Long nrViews,
+                                   BusinessEntity business, Set<TicketEntity> tickets,
+                                   OfferContactEntity offerContact, UserEntity user) {
         this.id = id;
         this.title = title;
         this.address = address;
@@ -125,6 +126,14 @@ public class ActivityOfferDetailsDTO {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public Long getNrViews() {
+        return nrViews;
+    }
+
+    public void setNrViews(Long nrViews) {
+        this.nrViews = nrViews;
     }
 
     public OfferStatus getStatus() {

@@ -49,6 +49,7 @@ public class AttractionOfferService {
         attractionOffer.setStatus(OfferStatus.active);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.attractions);
         attractionOffer.setCategory(category);
+        attractionOffer.setNrViews(0L);
         this.addAttractionOfferTickets(attractionOffer, attractionOffer.getTickets());
         return this.attractionOfferDAO.save(attractionOffer).getId();
     }
@@ -127,6 +128,7 @@ public class AttractionOfferService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Attraction offer with id: " + offerId + " was not found")
                 );
+        offer.setNrViews(offer.getNrViews() + 1);
         AttractionDTOMapper mapper = new AttractionDTOMapper();
         return mapper.mapAttractionOfferToDetailsDTO(offer);
     }

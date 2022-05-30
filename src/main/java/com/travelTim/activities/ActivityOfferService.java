@@ -53,6 +53,7 @@ public class ActivityOfferService {
         activityOffer.setStatus(OfferStatus.active);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.activities);
         activityOffer.setCategory(category);
+        activityOffer.setNrViews(0L);
         this.addActivityOfferTickets(activityOffer, activityOffer.getTickets());
         return this.activityOfferDAO.save(activityOffer).getId();
     }
@@ -173,6 +174,7 @@ public class ActivityOfferService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Activity offer with id: " + offerId + " was not found")
                 );
+        offer.setNrViews(offer.getNrViews() + 1);
         ActivityDTOMapper mapper = new ActivityDTOMapper();
         return mapper.mapActivityOfferToDetailsDTO(offer);
     }

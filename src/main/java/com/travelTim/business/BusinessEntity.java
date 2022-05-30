@@ -6,6 +6,7 @@ import com.travelTim.attractions.AttractionOfferEntity;
 import com.travelTim.food.FoodOfferEntity;
 import com.travelTim.location.City;
 import com.travelTim.lodging.LegalPersonLodgingOfferEntity;
+import com.travelTim.review.ReviewEntity;
 import com.travelTim.user.UserEntity;
 
 import javax.persistence.*;
@@ -56,6 +57,10 @@ public class BusinessEntity {
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<ActivityOfferEntity> activityOffers = new HashSet<>();
+
+    @OneToMany(mappedBy = "business", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<ReviewEntity> reviews = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -210,5 +215,13 @@ public class BusinessEntity {
     public void removeSchedule(BusinessDaySchedule daySchedule){
         this.schedule.remove(daySchedule);
         daySchedule.getBusinesses().remove(this);
+    }
+
+    public Set<ReviewEntity> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<ReviewEntity> reviews) {
+        this.reviews = reviews;
     }
 }

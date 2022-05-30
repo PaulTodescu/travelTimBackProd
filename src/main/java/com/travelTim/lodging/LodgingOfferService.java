@@ -67,6 +67,7 @@ public class LodgingOfferService {
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.lodging);
         lodgingOffer.setCategory(category);
         lodgingOffer.setStatus(OfferStatus.active);
+        lodgingOffer.setNrViews(0L);
         this.addLodgingOfferUtilities(lodgingOffer, lodgingOffer.getUtilities());
         return this.lodgingOfferDAO.save(lodgingOffer).getId();
     }
@@ -77,6 +78,7 @@ public class LodgingOfferService {
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.lodging);
         lodgingOffer.setCategory(category);
         lodgingOffer.setStatus(OfferStatus.active);
+        lodgingOffer.setNrViews(0L);
         this.addLodgingOfferUtilities(lodgingOffer, lodgingOffer.getUtilities());
         LegalPersonLodgingOfferEntity offer = this.lodgingOfferDAO.save(lodgingOffer);
         this.addLodgingOfferToFavouritesIfNeeded(offer, offer.getBusiness().getId());
@@ -126,6 +128,9 @@ public class LodgingOfferService {
                         .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 "Lodging offer of type legal person with id: " + offerId + " was not found")
                         );
+        for (LegalPersonLodgingOfferEntity legalOffer: offer.getBusiness().getLodgingOffers()) {
+            legalOffer.setNrViews(offer.getNrViews() + 1);
+        }
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         return mapper.mapLegalLodgingOfferToBaseDetailsDTO(offer);
     }
@@ -147,8 +152,11 @@ public class LodgingOfferService {
 //    }
 
     public Set<BusinessDaySchedule> getBusinessScheduleForLegalLodgingOffer(Long offerId) {
-        LegalPersonLodgingOfferEntity offer = (LegalPersonLodgingOfferEntity) this.findLodgingOfferEntityById(offerId);
-        return offer.getBusiness().getSchedule();
+        LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
+        if (offer instanceof LegalPersonLodgingOfferEntity) {
+            return ((LegalPersonLodgingOfferEntity) offer).getBusiness().getSchedule();
+        }
+        return new HashSet<>();
     }
 
     // if the user already added offers from same business,
@@ -184,6 +192,7 @@ public class LodgingOfferService {
                         "Lodging offer of type physical person with id: " + offerId +
                                 " was not found")
                 );
+        offer.setNrViews(offer.getNrViews() + 1);
         if (offer.getCurrency() == Currency.EUR){
              try {
             CurrencyConverter currencyConverter = new CurrencyConverter();

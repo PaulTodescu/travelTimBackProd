@@ -6,9 +6,11 @@ import com.travelTim.attractions.AttractionOfferEntity;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.food.FoodOfferEntity;
+import com.travelTim.location.LocationEntity;
 import com.travelTim.lodging.LodgingOfferEntity;
 import com.travelTim.lodging.PhysicalPersonLodgingOfferEntity;
 import com.travelTim.reservation.OfferReservationEntity;
+import com.travelTim.review.ReviewEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -70,6 +72,19 @@ public class UserEntity implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<OfferReservationEntity> reservations = new HashSet<>();
+
+    @OneToMany(mappedBy = "ownerUser", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<ReviewEntity> reviews = new HashSet<>();
+
+    @OneToMany(mappedBy = "targetUser", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<ReviewEntity> targetUserReviews = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<LocationEntity> visitedLocations = new HashSet<>();
+
 
     public UserEntity() {
     }
@@ -202,5 +217,29 @@ public class UserEntity implements Serializable {
 
     public void setReservations(Set<OfferReservationEntity> reservations) {
         this.reservations = reservations;
+    }
+
+    public Set<ReviewEntity> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<ReviewEntity> reviews) {
+        this.reviews = reviews;
+    }
+
+    public Set<ReviewEntity> getTargetUserReviews() {
+        return targetUserReviews;
+    }
+
+    public void setTargetUserReviews(Set<ReviewEntity> targetUserReviews) {
+        this.targetUserReviews = targetUserReviews;
+    }
+
+    public Set<LocationEntity> getVisitedLocations() {
+        return visitedLocations;
+    }
+
+    public void setVisitedLocations(Set<LocationEntity> visitedLocations) {
+        this.visitedLocations = visitedLocations;
     }
 }

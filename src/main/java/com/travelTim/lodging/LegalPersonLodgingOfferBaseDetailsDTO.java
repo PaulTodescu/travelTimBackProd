@@ -13,16 +13,18 @@ public class LegalPersonLodgingOfferBaseDetailsDTO {
     private String description;
     private BusinessEntity business;
     private OfferContactEntity offerContact;
+    private Long nrViews;
 
     public LegalPersonLodgingOfferBaseDetailsDTO() {
     }
 
     public LegalPersonLodgingOfferBaseDetailsDTO(Long id, String description, BusinessEntity business,
-                                                 OfferContactEntity offerContact) {
+                                                 OfferContactEntity offerContact, Long nrViews) {
         this.id = id;
         this.description = description;
         this.business = business;
         this.offerContact = offerContact;
+        this.nrViews = nrViews;
     }
 
     public Long getId() {
@@ -57,4 +59,11 @@ public class LegalPersonLodgingOfferBaseDetailsDTO {
         this.offerContact = offerContact;
     }
 
+    public Long getNrViews() {
+        return nrViews;
+    }
+
+    public void setNrViews(Long nrViews) {
+        this.nrViews = nrViews;
+    }
 }

@@ -1,7 +1,9 @@
 package com.travelTim.lodging;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.business.BusinessForOffersPageDTO;
 import com.travelTim.currency.Currency;
 import com.travelTim.location.City;
 import com.travelTim.offer.OfferStatus;
@@ -27,13 +29,14 @@ public class LodgingOfferDTO {
     private Float price;
     private Currency currency;
     private OfferStatus status;
+    private Long nrViews;
 
     public LodgingOfferDTO() {
     }
 
     public LodgingOfferDTO(Long id, BusinessEntity business, String title, String address, City city,
                            Integer nrRooms, Integer nrSingleBeds, Integer nrDoubleBeds, OfferStatus status,
-                           Integer floor,LocalDateTime createdAt, Float price, Currency currency) {
+                           Long nrViews, Integer floor,LocalDateTime createdAt, Float price, Currency currency) {
         this.id = id;
         this.business = business;
         this.title = title;
@@ -43,10 +46,12 @@ public class LodgingOfferDTO {
         this.nrSingleBeds = nrSingleBeds;
         this.nrDoubleBeds = nrDoubleBeds;
         this.status = status;
+        this.nrViews = nrViews;
         this.floor = floor;
         this.createdAt = createdAt;
         this.price = price;
         this.currency = currency;
+
     }
 
     public Long getId() {
@@ -57,8 +62,12 @@ public class LodgingOfferDTO {
         this.id = id;
     }
 
-    public BusinessEntity getBusiness() {
-        return business;
+    public BusinessForOffersPageDTO getBusiness() {
+        if (business != null) {
+            BusinessDTOMapper mapper = new BusinessDTOMapper();
+            return mapper.mapBusinessForOffersPageDTO(business);
+        }
+        return null;
     }
 
     public void setBusiness(BusinessEntity business) {
@@ -170,16 +179,24 @@ public class LodgingOfferDTO {
         this.status = status;
     }
 
+    public Long getNrViews() {
+        return nrViews;
+    }
+
+    public void setNrViews(Long nrViews) {
+        this.nrViews = nrViews;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof LodgingOfferDTO)) return false;
         LodgingOfferDTO that = (LodgingOfferDTO) o;
-        return Objects.equals(getBusiness(), that.getBusiness()) && Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getAddress(), that.getAddress());
+        return Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getAddress(), that.getAddress());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getBusiness(), getTitle(), getAddress());
+        return Objects.hash(getTitle(), getAddress());
     }
 }

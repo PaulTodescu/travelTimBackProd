@@ -2,6 +2,7 @@ package com.travelTim.lodging;
 
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,10 @@ public class LodgingDTOMapper {
 
     public Set<LodgingOfferDTO> mapLodgingOffersToDTOs(Set<LodgingOfferEntity> offers){
         return offers.stream().map(this::mapLodgingOfferToDTO).collect(Collectors.toSet());
+    }
+
+    public List<LodgingOfferDTO> mapLodgingOffersToDTOs(List<LodgingOfferEntity> offers){
+        return offers.stream().map(this::mapLodgingOfferToDTO).collect(Collectors.toList());
     }
 
     public LegalPersonLodgingOfferDTO mapLegalLodgingOfferToDTO(LegalPersonLodgingOfferEntity offer){

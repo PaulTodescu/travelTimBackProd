@@ -6,6 +6,7 @@ import com.travelTim.attractions.AttractionOfferForBusinessPageDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,10 @@ public class ActivityDTOMapper {
 
     public Set<ActivityOfferDTO> mapActivityOffersToDTOs(Set<ActivityOfferEntity> offers){
         return offers.stream().map(this::mapActivityOfferToDTO).collect(Collectors.toSet());
+    }
+
+    public List<ActivityOfferDTO> mapActivityOffersToDTOs(List<ActivityOfferEntity> offers){
+        return offers.stream().map(this::mapActivityOfferToDTO).collect(Collectors.toList());
     }
 
     public ActivityOfferBaseDetailsDTO mapActivityOfferToBaseDetailsDTO(ActivityOfferEntity offer){

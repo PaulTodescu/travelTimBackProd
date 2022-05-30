@@ -23,6 +23,7 @@ public class AttractionOfferDetailsDTO {
     private City city;
     private String description;
     private OfferStatus status;
+    private Long nrViews;
     private BusinessEntity business;
     private Set<TicketEntity> tickets;
     private OfferContactEntity offerContact;
@@ -32,15 +33,16 @@ public class AttractionOfferDetailsDTO {
     }
 
     public AttractionOfferDetailsDTO(Long id, String title, String address, City city,
-                                     String description, OfferStatus status, BusinessEntity business,
-                                     Set<TicketEntity> tickets, OfferContactEntity offerContact,
-                                     UserEntity user) {
+                                     String description, OfferStatus status, Long nrViews,
+                                     BusinessEntity business, Set<TicketEntity> tickets,
+                                     OfferContactEntity offerContact, UserEntity user) {
         this.id = id;
         this.title = title;
         this.address = address;
         this.city = city;
         this.description = description;
         this.status = status;
+        this.nrViews = nrViews;
         this.business = business;
         this.tickets = tickets;
         this.offerContact = offerContact;
@@ -128,6 +130,14 @@ public class AttractionOfferDetailsDTO {
 
     public OfferStatus getStatus() {
         return status;
+    }
+
+    public Long getNrViews() {
+        return nrViews;
+    }
+
+    public void setNrViews(Long nrViews) {
+        this.nrViews = nrViews;
     }
 
     public void setStatus(OfferStatus status) {

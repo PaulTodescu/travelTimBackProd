@@ -1,6 +1,8 @@
 package com.travelTim.food;
 
+import com.travelTim.business.BusinessDTOMapper;
 import com.travelTim.business.BusinessEntity;
+import com.travelTim.business.BusinessForOffersPageDTO;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -29,8 +31,12 @@ public class FoodOfferDTO {
         this.id = id;
     }
 
-    public BusinessEntity getBusiness() {
-        return business;
+    public BusinessForOffersPageDTO getBusiness() {
+        if (business != null) {
+            BusinessDTOMapper mapper = new BusinessDTOMapper();
+            return mapper.mapBusinessForOffersPageDTO(business);
+        }
+        return null;
     }
 
     public void setBusiness(BusinessEntity business) {

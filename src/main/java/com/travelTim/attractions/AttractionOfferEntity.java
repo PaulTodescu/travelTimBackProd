@@ -47,6 +47,9 @@ public class AttractionOfferEntity {
     @Enumerated(EnumType.STRING)
     private City city;
 
+    @Column(nullable = false)
+    private Long nrViews;
+
     @ManyToOne
     @JoinColumn(columnDefinition = "user_id")
     private UserEntity user;
@@ -211,5 +214,13 @@ public class AttractionOfferEntity {
 
     public void setFavourites(Set<FavouriteOffersEntity> favourites) {
         this.favourites = favourites;
+    }
+
+    public Long getNrViews() {
+        return nrViews;
+    }
+
+    public void setNrViews(Long nrViews) {
+        this.nrViews = nrViews;
     }
 }

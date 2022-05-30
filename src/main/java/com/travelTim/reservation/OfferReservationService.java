@@ -2,6 +2,8 @@ package com.travelTim.reservation;
 
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.email.EmailService;
+import com.travelTim.location.LocationEntity;
+import com.travelTim.location.LocationService;
 import com.travelTim.lodging.*;
 import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserEntity;
@@ -13,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -30,14 +31,17 @@ public class OfferReservationService {
     private final UserService userService;
     private final LodgingOfferService lodgingService;
     private final EmailService emailService;
+    private final LocationService locationService;
 
     @Autowired
     public OfferReservationService(OfferReservationDAO offerReservationDAO, UserService userService,
-                                   LodgingOfferService lodgingService, EmailService emailService) {
+                                   LodgingOfferService lodgingService, EmailService emailService,
+                                   LocationService locationService) {
         this.offerReservationDAO = offerReservationDAO;
         this.userService = userService;
         this.lodgingService = lodgingService;
         this.emailService = emailService;
+        this.locationService = locationService;
     }
 
     public void addReservation(Long userId, Long offerId, OfferReservationEntity reservation){
@@ -51,6 +55,9 @@ public class OfferReservationService {
         user.getReservations().add(reservation);
         reservation.setUser(user);
         offer.setStatus(OfferStatus.reserved);
+        this.locationService.addVisitedLocationForUser(
+                new LocationEntity(reservation.getAddress(), reservation.getCity())
+        );
 
         String reservationPhoneNumber;
         String providerPhoneNumber;
@@ -272,21 +279,6 @@ public class OfferReservationService {
                             "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getCity() + "</td>\n" +
                             "       </tr>\n" +
                             "       <tr style=\"border: none; background-color: #e1e2e3;\">\n" +
-                            "       <th style=\"padding: 15px 8px; text-align: left; border: none; font-weight: bold; font-family: Bahnschrift; font-size: 18px;\">Provider Contact</th>\n" +
-                            "       <td></td>\n" +
-                            "       </tr>\n" +
-                            "       <tr style=\"border: none;\">\n" +
-                            "       <th style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Name</th>\n" +
-                            "       <td style=\"padding: 20px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getProviderName() + "</td>\n" +
-                            "       </tr>\n" +
-                            "       <tr style=\"border: none;\">\n" +
-                            "       <th style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Email</th>\n" +
-                            "       <td style=\"padding: 8px 8px 8px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + reservation.getProviderEmail() + "</td>\n" +
-                            "       </tr>\n" +
-                            "       <tr style=\"border: none;\">\n" +
-                            "       <th style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">Phone</th>\n" +
-                            "       <td style=\"padding: 8px 8px 20px 8px; text-align: left; border: none; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\">" + providerPhoneNumber + "</td>\n" +
-                            "       </tr>\n" +
                             "   </table>\n" +
                             "</div>");
         } catch (MessagingException e) {
@@ -319,9 +311,8 @@ public class OfferReservationService {
     }
 
     public String getFormattedDate(LocalDateTime dateTime) {
-        LocalDate formattedDateTime = dateTime.toLocalDate();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return formattedDateTime.format(dateFormatter);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return dateTime.format(dateFormatter);
     }
 
     public OfferReservationDetailsDTO getReservationDetails(Long reservationId) {

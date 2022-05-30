@@ -55,6 +55,9 @@ public abstract class LodgingOfferEntity {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(nullable = false)
+    private Long nrViews;
+
     @ManyToOne
     @JoinColumn(columnDefinition = "user_id")
     private UserEntity user;
@@ -219,6 +222,14 @@ public abstract class LodgingOfferEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getNrViews() {
+        return nrViews;
+    }
+
+    public void setNrViews(Long nrViews) {
+        this.nrViews = nrViews;
     }
 
     public OfferContactEntity getOfferContact() {

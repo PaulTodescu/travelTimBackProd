@@ -17,4 +17,8 @@ public class BusinessDTOMapper {
     public BusinessDetailsDTO mapBusinessToDetailsDTO(BusinessEntity business){
         return this.modelMapper.map(business, BusinessDetailsDTO.class);
     }
+
+    public BusinessForOffersPageDTO mapBusinessForOffersPageDTO(BusinessEntity business){
+        return this.modelMapper.map(business, BusinessForOffersPageDTO.class);
+    }
 }

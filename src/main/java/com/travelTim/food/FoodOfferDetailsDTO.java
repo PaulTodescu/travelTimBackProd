@@ -13,17 +13,19 @@ public class FoodOfferDetailsDTO {
     private BusinessEntity business;
     private Set<FoodMenuCategory> foodMenuCategories;
     private OfferStatus status;
+    private Long nrViews;
 
     public FoodOfferDetailsDTO() {
     }
 
     public FoodOfferDetailsDTO(Long id, String description, BusinessEntity business,
-                               Set<FoodMenuCategory> foodMenuCategories, OfferStatus status) {
+                               Set<FoodMenuCategory> foodMenuCategories, OfferStatus status, Long nrViews) {
         this.id = id;
         this.description = description;
         this.business = business;
         this.foodMenuCategories = foodMenuCategories;
         this.status = status;
+        this.nrViews = nrViews;
     }
 
     public Long getId() {
@@ -65,5 +67,13 @@ public class FoodOfferDetailsDTO {
 
     public void setStatus(OfferStatus status) {
         this.status = status;
+    }
+
+    public Long getNrViews() {
+        return nrViews;
+    }
+
+    public void setNrViews(Long nrViews) {
+        this.nrViews = nrViews;
     }
 }

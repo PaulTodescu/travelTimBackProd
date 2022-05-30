@@ -61,7 +61,7 @@ public class BusinessController {
     }
 
     @DeleteMapping(path = "/{businessId}")
-    public ResponseEntity<?> deleteBusiness(@PathVariable("businessId") Long businessId){
+    public ResponseEntity<Void> deleteBusiness(@PathVariable("businessId") Long businessId){
         this.businessService.deleteBusiness(businessId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

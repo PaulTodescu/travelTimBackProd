@@ -51,6 +51,7 @@ public class FoodOfferService {
         foodOffer.setStatus(OfferStatus.active);
         CategoryEntity category = this.categoryService.findCategoryByName(CategoryType.food);
         foodOffer.setCategory(category);
+        foodOffer.setNrViews(0L);
         try {
             return this.foodOfferDAO.save(foodOffer).getId();
         } catch (DataIntegrityViolationException exception){
@@ -61,10 +62,12 @@ public class FoodOfferService {
     }
 
     public FoodOfferEntity findFoodOfferById(Long foodOfferId){
-        return this.foodOfferDAO.findFoodOfferEntityById(foodOfferId).orElseThrow(
+        FoodOfferEntity offer = this.foodOfferDAO.findFoodOfferEntityById(foodOfferId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Food offer with id: " + foodOfferId + " was not found")
         );
+        offer.setNrViews(offer.getNrViews() + 1);
+        return offer;
     }
 
     public FoodOfferDetailsDTO getFoodOfferDetails(Long foodOfferId){
@@ -138,7 +141,7 @@ public class FoodOfferService {
     public void editContactDetails(Long offerId, OfferContactEntity offerContact){
         FoodOfferEntity offer = this.findFoodOfferById(offerId);
         OfferContactEntity initialOfferContact = offer.getOfferContact();
-        if (!initialOfferContact.equals(offerContact)) {
+        if (initialOfferContact != null && !initialOfferContact.equals(offerContact)) {
             this.deleteOfferContact(offer, initialOfferContact);
         }
         this.setContactDetails(offer, offerContact);
