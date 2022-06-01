@@ -1,5 +1,6 @@
 package com.travelTim.lodging;
 
+import com.google.common.math.Stats;
 import com.travelTim.business.BusinessDaySchedule;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.business.BusinessService;
@@ -23,7 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -39,6 +42,7 @@ public class LodgingOfferService {
     private final ImageUtils imageUtils;
     private final BusinessService businessService;
     private final FavouriteOffersService favouriteOffersService;
+    private final LodgingOfferRequestedPriceDAO requestedPriceDAO;
 
     @Autowired
     public LodgingOfferService(LodgingOfferDAO lodgingOfferDAO, LegalPersonLodgingOfferDAO legalPersonLodgingOfferDAO,
@@ -48,7 +52,8 @@ public class LodgingOfferService {
                                CategoryService categoryService,
                                ImageUtils imageUtils,
                                @Lazy BusinessService businessService,
-                               @Lazy FavouriteOffersService favouriteOffersService) {
+                               @Lazy FavouriteOffersService favouriteOffersService,
+                               LodgingOfferRequestedPriceDAO requestedPriceDAO) {
         this.lodgingOfferDAO = lodgingOfferDAO;
         this.legalPersonLodgingOfferDAO = legalPersonLodgingOfferDAO;
         this.physicalPersonLodgingOfferDAO = physicalPersonLodgingOfferDAO;
@@ -59,6 +64,7 @@ public class LodgingOfferService {
         this.imageUtils = imageUtils;
         this.businessService = businessService;
         this.favouriteOffersService = favouriteOffersService;
+        this.requestedPriceDAO = requestedPriceDAO;
     }
 
     public Long addPhysicalPersonLodgingOffer(PhysicalPersonLodgingOfferEntity lodgingOffer){
@@ -83,6 +89,10 @@ public class LodgingOfferService {
         LegalPersonLodgingOfferEntity offer = this.lodgingOfferDAO.save(lodgingOffer);
         this.addLodgingOfferToFavouritesIfNeeded(offer, offer.getBusiness().getId());
         return offer.getId();
+    }
+
+    public List<LodgingOfferEntity> findAllLodgingOffers(){
+        return lodgingOfferDAO.findAll();
     }
 
     public LodgingOfferEntity findLodgingOfferEntityById(Long lodgingOfferId){
@@ -143,6 +153,10 @@ public class LodgingOfferService {
                         );
         LodgingDTOMapper mapper = new LodgingDTOMapper();
         return mapper.mapLodgingOfferToLegalPersonOfferEditDTO(offer);
+    }
+
+    public List<LodgingOfferRequestedPrice> findAllLodgingOfferRequestedPrices() {
+        return this.requestedPriceDAO.findAll();
     }
 
 //    public LodgingOfferDetailsDTO getLodgingOfferDetails(Long offerId){
@@ -330,6 +344,51 @@ public class LodgingOfferService {
         LodgingOfferEntity offer = this.findLodgingOfferEntityById(offerId);
         offer.setStatus(status);
         this.lodgingOfferDAO.save(offer);
+    }
+
+    public LodgingOffersStatistics getLodgingOffersStatistics() {
+        List<LodgingOfferEntity> offers = this.findAllLodgingOffers();
+        List<Float> offersPrices = this.getLodgingOffersPrices(offers);
+
+        Double averageOffersViews = offers.stream()
+                .collect(Collectors.averagingDouble(LodgingOfferEntity::getNrViews));
+        Double averageOffersPrice = offersPrices.stream().mapToDouble((o) -> o).summaryStatistics().getAverage();
+
+        List<LodgingOfferEntity> userOffers =
+                new ArrayList<>(this.userService.findLoggedInUser().getLodgingOffers());
+        List<Float> userOffersPrices = this.getLodgingOffersPrices(userOffers);
+
+        Double averageUserOffersViews = userOffers.stream()
+                .collect(Collectors.averagingDouble(LodgingOfferEntity::getNrViews));
+        Double averageUserOffersPrice = userOffersPrices.stream().mapToDouble((o) -> o).summaryStatistics().getAverage();
+
+        Double averageRequestedPrice = this.findAllLodgingOfferRequestedPrices().stream()
+                .collect(Collectors.averagingDouble(LodgingOfferRequestedPrice::getPrice));
+
+        return new LodgingOffersStatistics(averageOffersViews, averageUserOffersViews,
+                averageOffersPrice, averageUserOffersPrice, averageRequestedPrice);
+    }
+
+    public void addRequestedLodgingOfferPrice(LodgingOfferRequestedPrice requestedPrice) {
+        this.requestedPriceDAO.save(requestedPrice);
+    }
+
+    public List<Float> getLodgingOffersPrices(List<LodgingOfferEntity> offers) {
+        try {
+            CurrencyConverter currencyConverter = new CurrencyConverter();
+            Float conversionRateFromEUR = currencyConverter.getCurrencyConversionRate(Currency.EUR.name(), Currency.RON.name());
+            return offers.stream()
+                    .map((offer) -> {
+                        if (offer.getCurrency() == Currency.EUR) {
+                            return currencyConverter.getConvertedPrice(offer.getPrice(), conversionRateFromEUR);
+                        } else {
+                            return offer.getPrice();
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException ioException) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not retrieve currency for monetary conversion");
+        }
     }
 
 }

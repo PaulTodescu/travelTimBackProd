@@ -19,10 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -131,6 +129,10 @@ public class ActivityOfferService {
         );
     }
 
+    public List<ActivityOfferEntity> findAllActivityOffers() {
+        return this.activityOfferDAO.findAll();
+    }
+
     public ActivityOfferEditDTO findActivityOfferForEdit(Long offerId){
         ActivityOfferEntity offer = this.findActivityOfferById(offerId);
         ActivityDTOMapper mapper = new ActivityDTOMapper();
@@ -192,5 +194,28 @@ public class ActivityOfferService {
         ActivityOfferEntity offer = this.findActivityOfferById(offerId);
         offer.setStatus(status);
         this.activityOfferDAO.save(offer);
+    }
+
+    public ActivityOffersStatistics getActivityOffersStatistics() {
+        List<ActivityOfferEntity> offers = this.findAllActivityOffers();
+        Double averageOffersViews = offers.stream()
+                .collect(Collectors.averagingDouble(ActivityOfferEntity::getNrViews));
+        Double averageOffersTicketsPrice = this.getAverageOffersTicketsPrices(offers);
+
+        Set<ActivityOfferEntity> userOffers = this.userService.findLoggedInUser().getActivityOffers();
+        Double averageUserOffersViews = userOffers.stream()
+                .collect(Collectors.averagingDouble(ActivityOfferEntity::getNrViews));
+        Double averageUserOffersTicketsPrice = this.getAverageOffersTicketsPrices(new ArrayList<>(userOffers));
+
+        return new ActivityOffersStatistics(averageOffersViews, averageUserOffersViews,
+                averageOffersTicketsPrice, averageUserOffersTicketsPrice);
+    }
+
+    public Double getAverageOffersTicketsPrices(List<ActivityOfferEntity> offers) {
+        List<TicketEntity> tickets = new ArrayList<>();
+        for (ActivityOfferEntity offer: offers) {
+            tickets.addAll(offer.getTickets());
+        }
+        return tickets.stream().collect(Collectors.averagingDouble(TicketEntity::getPrice));
     }
 }

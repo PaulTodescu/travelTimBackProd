@@ -136,5 +136,17 @@ public class LodgingOfferController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping(path = "/statistics")
+    public ResponseEntity<LodgingOffersStatistics> getLodgingOffersStatistics(){
+        LodgingOffersStatistics statistics = this.lodgingOfferService.getLodgingOffersStatistics();
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
+    }
+
+    @PostMapping("/price/request")
+    public ResponseEntity<Void> addRequestedLodgingOfferPrice (
+            @RequestBody LodgingOfferRequestedPrice requestedPrice){
+        this.lodgingOfferService.addRequestedLodgingOfferPrice(requestedPrice);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
 }

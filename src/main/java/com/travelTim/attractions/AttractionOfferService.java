@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -123,6 +124,10 @@ public class AttractionOfferService {
         );
     }
 
+    public List<AttractionOfferEntity> findAllAttractionOffers() {
+        return this.attractionOfferDAO.findAll();
+    }
+
     public AttractionOfferDetailsDTO getAttractionOfferDetails(Long offerId){
         AttractionOfferEntity offer = this.attractionOfferDAO.findAttractionsOfferEntityById(offerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -185,4 +190,29 @@ public class AttractionOfferService {
         offer.setStatus(status);
         this.attractionOfferDAO.save(offer);
     }
+
+    public AttractionOffersStatistics getAttractionOffersStatistics() {
+        List<AttractionOfferEntity> offers = this.findAllAttractionOffers();
+        Double averageOffersViews = offers.stream()
+                .collect(Collectors.averagingDouble(AttractionOfferEntity::getNrViews));
+        Double averageOffersTicketsPrice = this.getAverageOffersTicketsPrices(offers);
+
+        Set<AttractionOfferEntity> userOffers = this.userService.findLoggedInUser().getAttractionOffers();
+        Double averageUserOffersViews = userOffers.stream()
+                .collect(Collectors.averagingDouble(AttractionOfferEntity::getNrViews));
+        Double averageUserOffersTicketsPrice = this.getAverageOffersTicketsPrices(new ArrayList<>(userOffers));
+
+        return new AttractionOffersStatistics(averageOffersViews, averageUserOffersViews,
+                averageOffersTicketsPrice, averageUserOffersTicketsPrice);
+    }
+
+    public Double getAverageOffersTicketsPrices(List<AttractionOfferEntity> offers) {
+        List<TicketEntity> tickets = new ArrayList<>();
+        for (AttractionOfferEntity offer: offers) {
+            tickets.addAll(offer.getTickets());
+        }
+        return tickets.stream().collect(Collectors.averagingDouble(TicketEntity::getPrice));
+    }
+
+
 }

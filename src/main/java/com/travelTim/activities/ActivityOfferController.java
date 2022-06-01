@@ -1,5 +1,6 @@
 package com.travelTim.activities;
 
+import com.travelTim.attractions.AttractionOffersStatistics;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.offer.OfferStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,5 +91,11 @@ public class ActivityOfferController {
             @RequestBody OfferStatus status){
         this.activityOfferService.changeActivityOfferStatus(offerId, status);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/statistics")
+    public ResponseEntity<ActivityOffersStatistics> getActivityOffersStatistics(){
+        ActivityOffersStatistics statistics = this.activityOfferService.getActivityOffersStatistics();
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
     }
 }

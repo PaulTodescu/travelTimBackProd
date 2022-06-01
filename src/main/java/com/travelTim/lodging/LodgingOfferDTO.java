@@ -190,13 +190,16 @@ public class LodgingOfferDTO {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LodgingOfferDTO)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         LodgingOfferDTO that = (LodgingOfferDTO) o;
-        return Objects.equals(getTitle(), that.getTitle()) && Objects.equals(getAddress(), that.getAddress());
+        if (business != null && that.business != null) {
+            return business.equals(that.business);
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTitle(), getAddress());
+        return Objects.hash(business);
     }
 }

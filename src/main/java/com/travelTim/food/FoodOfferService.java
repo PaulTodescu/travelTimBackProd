@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -68,6 +69,10 @@ public class FoodOfferService {
         );
         offer.setNrViews(offer.getNrViews() + 1);
         return offer;
+    }
+
+    public List<FoodOfferEntity> findAllFoodOffers() {
+        return this.foodOfferDAO.findAll();
     }
 
     public FoodOfferDetailsDTO getFoodOfferDetails(Long foodOfferId){
@@ -201,5 +206,17 @@ public class FoodOfferService {
         FoodOfferEntity offer = this.findFoodOfferById(offerId);
         offer.setStatus(status);
         this.foodOfferDAO.save(offer);
+    }
+
+    public FoodOffersStatistics getFoodOffersStatistics() {
+        List<FoodOfferEntity> offers = this.findAllFoodOffers();
+        Double averageOffersViews = offers.stream()
+                .collect(Collectors.averagingDouble(FoodOfferEntity::getNrViews));
+
+        Set<FoodOfferEntity> userOffers = this.userService.findLoggedInUser().getFoodOffers();
+        Double averageUserOffersViews = userOffers.stream()
+                .collect(Collectors.averagingDouble(FoodOfferEntity::getNrViews));
+
+        return new FoodOffersStatistics(averageOffersViews, averageUserOffersViews);
     }
 }

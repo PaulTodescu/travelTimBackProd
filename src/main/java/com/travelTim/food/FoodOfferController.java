@@ -101,4 +101,10 @@ public class FoodOfferController {
         this.foodOfferService.changeFoodOfferStatus(offerId, status);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping(path = "/statistics")
+    public ResponseEntity<FoodOffersStatistics> getFoodOffersStatistics(){
+        FoodOffersStatistics statistics = this.foodOfferService.getFoodOffersStatistics();
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
+    }
 }

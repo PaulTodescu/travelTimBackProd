@@ -117,7 +117,7 @@ public class CategoryService {
                 //offer.setPrice(cheapestOfferPrice);
 
             } else { // offer is of physical type
-                offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));
+               offer.setImage(this.imageService.getOfferFrontImage("lodging", offer.getId()));
             }
         }
         return offers;
