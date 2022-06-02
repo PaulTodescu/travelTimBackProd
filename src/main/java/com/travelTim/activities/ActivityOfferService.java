@@ -1,13 +1,12 @@
 package com.travelTim.activities;
 
-import com.travelTim.attractions.AttractionOfferEntity;
 import com.travelTim.category.CategoryEntity;
 import com.travelTim.category.CategoryService;
 import com.travelTim.category.CategoryType;
 import com.travelTim.contact.OfferContactDAO;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
-import com.travelTim.files.ImageUtils;
+import com.travelTim.files.ImageService;
 import com.travelTim.offer.OfferStatus;
 import com.travelTim.ticket.TicketDAO;
 import com.travelTim.ticket.TicketEntity;
@@ -31,18 +30,18 @@ public class ActivityOfferService {
     private final TicketDAO ticketDAO;
     private final OfferContactDAO offerContactDAO;
     private final CategoryService categoryService;
-    private final ImageUtils imageUtils;
+    private final ImageService imageService;
 
     @Autowired
     public ActivityOfferService(ActivityOfferDAO activityOfferDAO, UserService userService,
                                 TicketDAO ticketDAO, OfferContactDAO offerContactDAO,
-                                CategoryService categoryService, ImageUtils imageUtils) {
+                                CategoryService categoryService, ImageService imageService) {
         this.activityOfferDAO = activityOfferDAO;
         this.userService = userService;
         this.ticketDAO = ticketDAO;
         this.offerContactDAO = offerContactDAO;
         this.categoryService = categoryService;
-        this.imageUtils = imageUtils;
+        this.imageService = imageService;
     }
 
     public Long addActivityOffer(ActivityOfferEntity activityOffer) {
@@ -186,7 +185,7 @@ public class ActivityOfferService {
         this.deleteOfferTickets(offer.getId());
         this.deleteOfferContact(offer, offer.getOfferContact());
         this.removeActivityOfferFromFavorites(offer);
-        this.imageUtils.deleteOfferImages("activities", offerId);
+        this.imageService.deleteOfferImages("activities", offerId);
         this.activityOfferDAO.deleteActivityOfferEntityById(offerId);
     }
 

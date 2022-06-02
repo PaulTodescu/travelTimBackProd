@@ -6,7 +6,7 @@ import com.travelTim.category.CategoryType;
 import com.travelTim.contact.OfferContactDAO;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
-import com.travelTim.files.ImageUtils;
+import com.travelTim.files.ImageService;
 import com.travelTim.offer.OfferStatus;
 import com.travelTim.ticket.TicketDAO;
 import com.travelTim.ticket.TicketEntity;
@@ -30,18 +30,18 @@ public class AttractionOfferService {
     private final OfferContactDAO offerContactDAO;
     private final UserService userService;
     private final CategoryService categoryService;
-    private final ImageUtils imageUtils;
+    private final ImageService imageService;
 
     @Autowired
     public AttractionOfferService(AttractionOfferDAO attractionOfferDAO, TicketDAO ticketDAO,
                                   OfferContactDAO offerContactDAO, UserService userService,
-                                  CategoryService categoryService, ImageUtils imageUtils) {
+                                  CategoryService categoryService, ImageService imageService) {
         this.attractionOfferDAO = attractionOfferDAO;
         this.ticketDAO = ticketDAO;
         this.offerContactDAO = offerContactDAO;
         this.userService = userService;
         this.categoryService = categoryService;
-        this.imageUtils = imageUtils;
+        this.imageService = imageService;
     }
 
     public Long addAttractionOffer(AttractionOfferEntity attractionOffer){
@@ -169,7 +169,7 @@ public class AttractionOfferService {
         this.deleteOfferTickets(offer.getId());
         this.deleteOfferContact(offer, offer.getOfferContact());
         this.removeAttractionOfferFromFavorites(offer);
-        this.imageUtils.deleteOfferImages("attractions", offerId);
+        this.imageService.deleteOfferImages("attractions", offerId);
         this.attractionOfferDAO.deleteAttractionOfferEntityById(offerId);
     }
 

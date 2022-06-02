@@ -1,6 +1,5 @@
 package com.travelTim.lodging;
 
-import com.google.common.math.Stats;
 import com.travelTim.business.BusinessDaySchedule;
 import com.travelTim.business.BusinessEntity;
 import com.travelTim.business.BusinessService;
@@ -12,7 +11,7 @@ import com.travelTim.currency.Currency;
 import com.travelTim.currency.CurrencyConverter;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.favourites.FavouriteOffersService;
-import com.travelTim.files.ImageUtils;
+import com.travelTim.files.ImageService;
 import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserEntity;
 import com.travelTim.user.UserService;
@@ -39,7 +38,7 @@ public class LodgingOfferService {
     private final OfferContactDAO offerContactDAO;
     private final UserService userService;
     private final CategoryService categoryService;
-    private final ImageUtils imageUtils;
+    private final ImageService imageService;
     private final BusinessService businessService;
     private final FavouriteOffersService favouriteOffersService;
     private final LodgingOfferRequestedPriceDAO requestedPriceDAO;
@@ -49,8 +48,7 @@ public class LodgingOfferService {
                                PhysicalPersonLodgingOfferDAO physicalPersonLodgingOfferDAO,
                                LodgingOfferUtilityDAO lodgingOfferUtilityDAO,
                                OfferContactDAO offerContactDAO, UserService userService,
-                               CategoryService categoryService,
-                               ImageUtils imageUtils,
+                               CategoryService categoryService, ImageService imageService,
                                @Lazy BusinessService businessService,
                                @Lazy FavouriteOffersService favouriteOffersService,
                                LodgingOfferRequestedPriceDAO requestedPriceDAO) {
@@ -61,7 +59,7 @@ public class LodgingOfferService {
         this.offerContactDAO = offerContactDAO;
         this.userService = userService;
         this.categoryService = categoryService;
-        this.imageUtils = imageUtils;
+        this.imageService = imageService;
         this.businessService = businessService;
         this.favouriteOffersService = favouriteOffersService;
         this.requestedPriceDAO = requestedPriceDAO;
@@ -336,7 +334,7 @@ public class LodgingOfferService {
         this.deleteLodgingOfferUtilities(offer);
         this.deleteOfferContact(offer, offer.getOfferContact());
         this.removeLodgingOfferFromFavorites(offer);
-        this.imageUtils.deleteOfferImages("lodging", offerId);
+        this.imageService.deleteOfferImages("lodging", offerId);
         this.lodgingOfferDAO.deleteLodgingOfferEntityById(offerId);
     }
 

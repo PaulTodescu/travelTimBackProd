@@ -155,7 +155,7 @@ public class BusinessService {
         }
         this.deleteSchedule(businessId);
         this.businessDAO.deleteBusinessEntityById(businessId);
-        //this.imageUtils.deleteImage(businessId, ImageType.BUSINESS);
+        this.imageService.deleteBusinessImages(businessId);
     }
 
     public void deleteSchedule(Long businessId){

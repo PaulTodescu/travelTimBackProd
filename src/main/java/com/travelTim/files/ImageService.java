@@ -1,7 +1,8 @@
 package com.travelTim.files;
 
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.*;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -21,186 +22,210 @@ import java.util.*;
 @Service
 public class ImageService {
 
-    private final ServletContext context;
-    private final ImageUtils imageUtils;
+    private final Storage storage;
 
     @Autowired
-    public ImageService(ServletContext context, ImageUtils imageUtils) {
-        this.context = context;
-        this.imageUtils = imageUtils;
+    public ImageService(Storage storage) {
+        this.storage = storage;
     }
 
-    public void uploadUserImage(Long id, Optional<MultipartFile> image) {
-        String uploadPath = this.imageUtils.getUploadPath(ImageType.USER, id);
-        if (uploadPath == null){
-            return;
-        }
-
-        File directory = this.imageUtils.createImageDirectory(uploadPath);
-        if (directory == null){
-            return;
-        }
-
-        int nrFiles = Objects.requireNonNull(directory.list()).length;
-        if (image.isPresent()){
-            MultipartFile imageFile = image.get();
-            try {
-                Path copyLocation = Paths
-                        .get(uploadPath + File.separator + StringUtils.cleanPath(Objects.requireNonNull(imageFile.getOriginalFilename())));
-                if (nrFiles != 0) {
-                    FileUtils.cleanDirectory(directory);
-                }
-                Files.copy(imageFile.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Could not store file " + imageFile.getOriginalFilename());
+    public void uploadUserImage(Long userId, Optional<MultipartFile> image) throws IOException {
+        String uploadPath = "images/user/" + userId;
+        if (image.isPresent()) {
+            Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+            if (blobs.getValues().iterator().hasNext()) {
+                blobs.getValues().iterator().next().delete();
             }
+            BlobId blobId = BlobId.of("traveltim", uploadPath + "/" + image.get().getOriginalFilename());
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+            byte[] arr = image.get().getBytes();
+            storage.create(blobInfo, arr);
         } else {
-            this.uploadDefaultImage(id, ImageType.USER);
+            this.uploadDefaultUserImage(userId);
         }
     }
 
-    public void uploadBusinessImages(Long businessId, Optional<List<MultipartFile>> images) {
-        String uploadPath = this.imageUtils.getUploadPath(ImageType.BUSINESS, businessId);
-        if (uploadPath == null){
-            return;
-        }
-
-        File directory = this.imageUtils.createImageDirectory(uploadPath);
-        if (directory == null){
-            return;
-        }
-
-        int nrFiles = Objects.requireNonNull(directory.list()).length;
-        if (nrFiles != 0) {
-            try {
-                FileUtils.cleanDirectory(directory);
-            } catch (IOException e){
-                e.printStackTrace();
+    public void uploadDefaultUserImage(Long userId) {
+        String defaultImageName = "default.png";
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix("images/user/"));
+        for (Blob blob: blobs.getValues()) {
+            String fileName = this.getFileNameFromPath(blob.getName());
+            if (fileName.equals(defaultImageName)) {
+                BlobId blobId = BlobId.of("traveltim", "images/user/" + userId + "/" + defaultImageName);
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+                byte[] arr = blob.getContent();
+                storage.create(blobInfo, arr);
+                return;
             }
         }
-        if (images.isPresent()) {
-            for (MultipartFile image : images.get()) {
-                try {
-                    Path copyLocation = Paths
-                            .get(uploadPath + File.separator + StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename())));
-                    Files.copy(image.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Could not store file " + image.getOriginalFilename());
-                }
-            }
-        } else {
-            this.uploadDefaultImage(businessId, ImageType.BUSINESS);
-        }
-    }
-
-    public void uploadDefaultImage(Long id, ImageType imageType) {
-        String uploadPath = this.imageUtils.getUploadPath(imageType, id);
-        if (uploadPath == null){
-            return;
-        }
-
-        File directory = this.imageUtils.createImageDirectory(uploadPath);
-        if (directory == null){
-            return;
-        }
-
-        String defaultImagePath = this.imageUtils.getDefaultImagePath(imageType);
-
-        try {
-            InputStream defaultImage = new FileInputStream(context.getRealPath(defaultImagePath));
-            Path copyLocation = Paths
-                    .get(uploadPath + File.separator + StringUtils.cleanPath("default.png"));
-            Files.copy(defaultImage, copyLocation, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Could not store file");
-        }
-    }
-
-    public void uploadOfferImages(Long offerId, List<MultipartFile> offerImages, String offerType) {
-        String uploadPath = this.imageUtils.getOfferUploadPath(offerType, offerId);
-        if (uploadPath == null){
-            return;
-        }
-
-        File directory = this.imageUtils.createImageDirectory(uploadPath);
-        if (directory == null){
-            return;
-        }
-        try {
-            FileUtils.cleanDirectory(directory);
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-
-        for (MultipartFile image: offerImages) {
-            try {
-                Path copyLocation = Paths
-                        .get(uploadPath + File.separator + StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename())));
-                Files.copy(image.getInputStream(), copyLocation, StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException("Could not store file " + image.getOriginalFilename());
-            }
-        }
-    }
-
-    public List<String> getOfferImagesNames(String offerType, Long offerId) {
-        String path = this.imageUtils.getOfferUploadPath(offerType, offerId);
-        if (path == null){
-            return Collections.emptyList();
-        }
-        return this.imageUtils.getImagesNames(path);
     }
 
     public String getUserImage(Long userId){
-        String imagePath = this.imageUtils.getUploadPath(ImageType.USER, userId);
-        if (imagePath == null){
-            return null;
+        String uploadPath = "images/user/" + userId;
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        Blob imageBlob = blobs.getValues().iterator().next();
+        return imageBlob.getMediaLink();
+    }
+
+    public void deleteUserImage(Long userId) {
+        String uploadPath = "images/user/" + userId;
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        if (blobs.getValues().iterator().hasNext()) {
+            blobs.getValues().forEach(Blob::delete);
         }
-        return this.imageUtils.getImage(imagePath);
+    }
+
+    public void uploadBusinessImages(Long businessId, Optional<List<MultipartFile>> images) throws IOException {
+        String uploadPath = "images/business/" + businessId;
+        if (images.isPresent()) {
+            Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+            if (blobs.getValues().iterator().hasNext()) {
+                blobs.getValues().forEach(Blob::delete);
+            }
+            for (MultipartFile image : images.get()) {
+                BlobId blobId = BlobId.of("traveltim", uploadPath + "/" + image.getOriginalFilename());
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+                byte[] arr = image.getBytes();
+                storage.create(blobInfo, arr);
+            }
+        } else {
+            this.uploadDefaultBusinessImage(businessId);
+        }
+    }
+
+    public void uploadDefaultBusinessImage(Long businessId) {
+        String defaultImageName = "default.png";
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix("images/business/"));
+        for (Blob blob: blobs.getValues()) {
+            String fileName = this.getFileNameFromPath(blob.getName());
+            if (fileName.equals(defaultImageName)) {
+                BlobId blobId = BlobId.of("traveltim", "images/business/" + businessId + "/" + defaultImageName);
+                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+                byte[] arr = blob.getContent();
+                storage.create(blobInfo, arr);
+                return;
+            }
+        }
     }
 
     public List<String> getBusinessImages(Long businessId){
-        String path = this.imageUtils.getUploadPath(ImageType.BUSINESS, businessId);
-        return this.imageUtils.getImages(path);
+        List<String> images = new ArrayList<>();
+        String uploadPath = "images/business/" + businessId;
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        for (Blob imageBlob: blobs.getValues()) {
+            images.add(imageBlob.getMediaLink());
+        }
+        return images;
     }
 
     public String getBusinessFrontImage(Long businessId){
-        return this.getBusinessImages(businessId).get(0);
+        String uploadPath = "images/business/" + businessId;
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        if (blobs.getValues().iterator().hasNext()) {
+            return blobs.getValues().iterator().next().getMediaLink();
+        }
+        return "";
     }
 
     public List<String> getBusinessImagesNames(Long businessId){
-        String path = this.imageUtils.getUploadPath(ImageType.BUSINESS, businessId);
-        return this.imageUtils.getImagesNames(path);
+        List<String> imageNames = new ArrayList<>();
+        String uploadPath = "images/business/" + businessId;
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        for (Blob imageBlob: blobs.getValues()) {
+            imageNames.add(this.getFileNameFromPath(imageBlob.getName()));
+        }
+        return imageNames;
+    }
+
+    public void deleteBusinessImages(Long businessId) {
+        String uploadPath = "images/business/" + businessId;
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        if (blobs.getValues().iterator().hasNext()) {
+            blobs.getValues().forEach(Blob::delete);
+        }
+    }
+
+    public void uploadOfferImages(Long offerId, List<MultipartFile> images, String offerType) throws IOException {
+        String uploadPath = this.getOfferUploadPath(offerType, offerId);
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        if (blobs.getValues().iterator().hasNext()) {
+            blobs.getValues().forEach(Blob::delete);
+        }
+        for (MultipartFile image : images) {
+            BlobId blobId = BlobId.of("traveltim", uploadPath + "/" + image.getOriginalFilename());
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
+            byte[] arr = image.getBytes();
+            storage.create(blobInfo, arr);
+        }
     }
 
     public List<String> getOfferImages(String offerType, Long offerId){
-        String path = this.imageUtils.getOfferUploadPath(offerType, offerId);
-        return this.imageUtils.getImages(path);
+        List<String> images = new ArrayList<>();
+        String uploadPath = this.getOfferUploadPath(offerType, offerId);
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        for (Blob imageBlob: blobs.getValues()) {
+            images.add(imageBlob.getMediaLink());
+        }
+        return images;
     }
-
 
     public String getOfferFrontImage(String offerType, Long offerId){
-        return this.getOfferImages(offerType, offerId).get(0);
+        String uploadPath = this.getOfferUploadPath(offerType, offerId);
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        if (blobs.getValues().iterator().hasNext()) {
+            return blobs.getValues().iterator().next().getMediaLink();
+        }
+        return "";
     }
 
-    public String getImagePath(Long id, ImageType imageType) {
-        String imagePath = this.imageUtils.getUploadPath(imageType, id);
-        if (imagePath == null){
-            return null;
+    public List<String> getOfferImagesBase64(String offerType, Long offerId){
+        List<String> images = new ArrayList<>();
+        String uploadPath = this.getOfferUploadPath(offerType, offerId);
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        for (Blob imageBlob: blobs.getValues()) {
+            String encodeBase64 = Base64.getEncoder().encodeToString(imageBlob.getContent());
+            String image = "data:image/" + this.getFileNameFromPath(imageBlob.getName()) + ";base64," + encodeBase64;
+            images.add(image);
         }
-        File imageDirectory = new File(imagePath);
-        File[] imageDirectoryContent = imageDirectory.listFiles();
-        if (imageDirectoryContent != null) {
-            if (imageDirectoryContent.length != 1) {
-                return null;
-            }
-            return imageDirectoryContent[0].getName();
+        return images;
+    }
+
+    public List<String> getOfferImagesNames(String offerType, Long offerId) {
+        List<String> images = new ArrayList<>();
+        String uploadPath = this.getOfferUploadPath(offerType, offerId);
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        for (Blob imageBlob: blobs.getValues()) {
+            images.add(this.getFileNameFromPath(imageBlob.getName()));
         }
-        return null;
+        return images;
+    }
+
+    public void deleteOfferImages(String offerType, Long offerId) {
+        String uploadPath = this.getOfferUploadPath(offerType, offerId);
+        Page<Blob> blobs = storage.list("traveltim", Storage.BlobListOption.prefix(uploadPath));
+        if (blobs.getValues().iterator().hasNext()) {
+            blobs.getValues().forEach(Blob::delete);
+        }
+    }
+
+    public String getFileNameFromPath(String path) {
+        return Paths.get(path).getFileName().toString();
+    }
+
+    public String getOfferUploadPath(String offerType, Long offerId){
+        String basePath = "images/offer";
+        switch (offerType){
+            case "lodging":
+                return basePath + "/lodging/" + offerId;
+            case "food":
+                return basePath + "/food/" + offerId;
+            case "attractions":
+                return basePath + "/attractions/" + offerId;
+            case "activities":
+                return basePath + "/activities/" + offerId;
+            default:
+                return "";
+        }
     }
 
 }

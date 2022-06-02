@@ -9,14 +9,10 @@ import com.travelTim.currency.Currency;
 import com.travelTim.currency.CurrencyConverter;
 import com.travelTim.favourites.FavouriteOffersEntity;
 import com.travelTim.files.ImageService;
-import com.travelTim.files.ImageType;
-import com.travelTim.files.ImageUtils;
 import com.travelTim.food.FoodDTOMapper;
 import com.travelTim.food.FoodOfferBaseDetailsDTO;
-import com.travelTim.food.FoodOfferEntity;
 import com.travelTim.food.FoodOfferService;
 import com.travelTim.lodging.*;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -36,7 +32,6 @@ public class UserService {
 
     private final UserDAO userDAO;
     private final ImageService imageService;
-    private final ImageUtils imageUtils;
     private final LodgingOfferService lodgingOfferService;
     private final FoodOfferService foodOfferService;
     private final AttractionOfferService attractionOfferService;
@@ -44,7 +39,7 @@ public class UserService {
     private final BusinessService businessService;
 
     @Autowired
-    public UserService(UserDAO userDAO, ImageService imageService, ImageUtils imageUtils,
+    public UserService(UserDAO userDAO, ImageService imageService,
                        @Lazy LodgingOfferService lodgingOfferService,
                        @Lazy FoodOfferService foodOfferService,
                        @Lazy AttractionOfferService attractionOfferService,
@@ -52,7 +47,6 @@ public class UserService {
                        @Lazy BusinessService businessService) {
         this.userDAO = userDAO;
         this.imageService = imageService;
-        this.imageUtils = imageUtils;
         this.lodgingOfferService = lodgingOfferService;
         this.foodOfferService = foodOfferService;
         this.attractionOfferService = attractionOfferService;
@@ -60,7 +54,7 @@ public class UserService {
         this.businessService = businessService;
     }
 
-    public void addUser(UserEntity user) {
+    public void addUser(UserEntity user) throws IOException {
         Optional<UserEntity> userOptional = userDAO.findUserEntityByEmail(user.getEmail());
         if (userOptional.isPresent()){
             throw new IllegalArgumentException("User with email " + user.getEmail() + " already exists");
@@ -153,7 +147,7 @@ public class UserService {
         UserEntity user = this.findLoggedInUser();
         if (user.getBusinesses().size() > 0){
             for (BusinessEntity business: user.getBusinesses()){
-                this.imageUtils.deleteImage(business.getId(), ImageType.BUSINESS);
+                this.imageService.deleteBusinessImages(business.getId());
                 this.businessService.deleteBusiness(business.getId());
             }
         }
@@ -178,7 +172,7 @@ public class UserService {
             }
         }
         this.userDAO.deleteUserEntityById(user.getId());
-        this.imageUtils.deleteImage(user.getId(), ImageType.USER);
+        this.imageService.deleteUserImage(user.getId());
     }
 
     public List<BusinessEntity> getAllBusinessesForCurrentUser() {

@@ -6,7 +6,7 @@ import com.travelTim.category.CategoryType;
 import com.travelTim.contact.OfferContactDAO;
 import com.travelTim.contact.OfferContactEntity;
 import com.travelTim.favourites.FavouriteOffersEntity;
-import com.travelTim.files.ImageUtils;
+import com.travelTim.files.ImageService;
 import com.travelTim.offer.OfferStatus;
 import com.travelTim.user.UserEntity;
 import com.travelTim.user.UserService;
@@ -30,20 +30,20 @@ public class FoodOfferService {
     private final UserService userService;
     private final OfferContactDAO offerContactDAO;
     private final CategoryService categoryService;
-    private final ImageUtils imageUtils;
+    private final ImageService imageService;
 
     @Autowired
     public FoodOfferService(FoodOfferDAO foodOfferDAO, FoodMenuCategoryDAO foodMenuCategoryDAO,
                             FoodMenuItemDAO foodMenuItemDAO, UserService userService,
                             OfferContactDAO offerContactDAO, CategoryService categoryService,
-                            ImageUtils imageUtils) {
+                            ImageService imageService) {
         this.foodOfferDAO = foodOfferDAO;
         this.foodMenuCategoryDAO = foodMenuCategoryDAO;
         this.foodMenuItemDAO = foodMenuItemDAO;
         this.userService = userService;
         this.offerContactDAO = offerContactDAO;
         this.categoryService = categoryService;
-        this.imageUtils = imageUtils;
+        this.imageService = imageService;
     }
 
     public Long addFoodOffer(FoodOfferEntity foodOffer) {
@@ -198,7 +198,7 @@ public class FoodOfferService {
         this.deleteFoodOfferMenu(offer);
         this.deleteOfferContact(offer, offer.getOfferContact());
         this.removeFoodOfferFromFavorites(offer);
-        this.imageUtils.deleteOfferImages("food", offerId);
+        this.imageService.deleteOfferImages("food", offerId);
         this.foodOfferDAO.deleteFoodOfferEntityById(offerId);
     }
 
