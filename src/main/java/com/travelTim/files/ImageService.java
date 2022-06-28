@@ -32,11 +32,11 @@ public class ImageService {
     public void uploadUserImage(Long userId, Optional<MultipartFile> image) throws IOException {
         String uploadPath = "user/" + userId;
         if (image.isPresent()) {
-            Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+            Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
             if (blobs.getValues().iterator().hasNext()) {
                 blobs.getValues().iterator().next().delete();
             }
-            BlobId blobId = BlobId.of("traveltim-images", uploadPath + "/" + image.get().getOriginalFilename());
+            BlobId blobId = BlobId.of("traveltim-prod-images", uploadPath + "/" + image.get().getOriginalFilename());
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
             byte[] arr = image.get().getBytes();
             storage.create(blobInfo, arr);
@@ -47,11 +47,11 @@ public class ImageService {
 
     public void uploadDefaultUserImage(Long userId) {
         String defaultImageName = "default.png";
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix("user/"));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix("user/"));
         for (Blob blob: blobs.getValues()) {
             String fileName = this.getFileNameFromPath(blob.getName());
             if (fileName.equals(defaultImageName)) {
-                BlobId blobId = BlobId.of("traveltim-images", "user/" + userId + "/" + defaultImageName);
+                BlobId blobId = BlobId.of("traveltim-prod-images", "user/" + userId + "/" + defaultImageName);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
                 byte[] arr = blob.getContent();
                 storage.create(blobInfo, arr);
@@ -62,14 +62,14 @@ public class ImageService {
 
     public String getUserImage(Long userId){
         String uploadPath = "user/" + userId;
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         Blob imageBlob = blobs.getValues().iterator().next();
         return imageBlob.getMediaLink();
     }
 
     public void deleteUserImage(Long userId) {
         String uploadPath = "user/" + userId;
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         if (blobs.getValues().iterator().hasNext()) {
             blobs.getValues().forEach(Blob::delete);
         }
@@ -78,12 +78,12 @@ public class ImageService {
     public void uploadBusinessImages(Long businessId, Optional<List<MultipartFile>> images) throws IOException {
         String uploadPath = "business/" + businessId;
         if (images.isPresent()) {
-            Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+            Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
             if (blobs.getValues().iterator().hasNext()) {
                 blobs.getValues().forEach(Blob::delete);
             }
             for (MultipartFile image : images.get()) {
-                BlobId blobId = BlobId.of("traveltim-images", uploadPath + "/" + image.getOriginalFilename());
+                BlobId blobId = BlobId.of("traveltim-prod-images", uploadPath + "/" + image.getOriginalFilename());
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
                 byte[] arr = image.getBytes();
                 storage.create(blobInfo, arr);
@@ -95,11 +95,11 @@ public class ImageService {
 
     public void uploadDefaultBusinessImage(Long businessId) {
         String defaultImageName = "default.png";
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix("business/"));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix("business/"));
         for (Blob blob: blobs.getValues()) {
             String fileName = this.getFileNameFromPath(blob.getName());
             if (fileName.equals(defaultImageName)) {
-                BlobId blobId = BlobId.of("traveltim-images", "business/" + businessId + "/" + defaultImageName);
+                BlobId blobId = BlobId.of("traveltim-prod-images", "business/" + businessId + "/" + defaultImageName);
                 BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
                 byte[] arr = blob.getContent();
                 storage.create(blobInfo, arr);
@@ -111,7 +111,7 @@ public class ImageService {
     public List<String> getBusinessImages(Long businessId){
         List<String> images = new ArrayList<>();
         String uploadPath = "business/" + businessId;
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         for (Blob imageBlob: blobs.getValues()) {
             images.add(imageBlob.getMediaLink());
         }
@@ -120,7 +120,7 @@ public class ImageService {
 
     public String getBusinessFrontImage(Long businessId){
         String uploadPath = "business/" + businessId;
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         if (blobs.getValues().iterator().hasNext()) {
             return blobs.getValues().iterator().next().getMediaLink();
         }
@@ -130,7 +130,7 @@ public class ImageService {
     public List<String> getBusinessImagesNames(Long businessId){
         List<String> imageNames = new ArrayList<>();
         String uploadPath = "business/" + businessId;
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         for (Blob imageBlob: blobs.getValues()) {
             imageNames.add(this.getFileNameFromPath(imageBlob.getName()));
         }
@@ -139,7 +139,7 @@ public class ImageService {
 
     public void deleteBusinessImages(Long businessId) {
         String uploadPath = "business/" + businessId;
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         if (blobs.getValues().iterator().hasNext()) {
             blobs.getValues().forEach(Blob::delete);
         }
@@ -147,12 +147,12 @@ public class ImageService {
 
     public void uploadOfferImages(Long offerId, List<MultipartFile> images, String offerType) throws IOException {
         String uploadPath = this.getOfferUploadPath(offerType, offerId);
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         if (blobs.getValues().iterator().hasNext()) {
             blobs.getValues().forEach(Blob::delete);
         }
         for (MultipartFile image : images) {
-            BlobId blobId = BlobId.of("traveltim-images", uploadPath + "/" + image.getOriginalFilename());
+            BlobId blobId = BlobId.of("traveltim-prod-images", uploadPath + "/" + image.getOriginalFilename());
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
             byte[] arr = image.getBytes();
             storage.create(blobInfo, arr);
@@ -162,7 +162,7 @@ public class ImageService {
     public List<String> getOfferImages(String offerType, Long offerId){
         List<String> images = new ArrayList<>();
         String uploadPath = this.getOfferUploadPath(offerType, offerId);
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         for (Blob imageBlob: blobs.getValues()) {
             System.out.println(imageBlob.getMediaLink());
             images.add(imageBlob.getMediaLink());
@@ -172,7 +172,7 @@ public class ImageService {
 
     public String getOfferFrontImage(String offerType, Long offerId){
         String uploadPath = this.getOfferUploadPath(offerType, offerId);
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         if (blobs.getValues().iterator().hasNext()) {
             return blobs.getValues().iterator().next().getMediaLink();
         }
@@ -182,7 +182,7 @@ public class ImageService {
     public List<String> getOfferImagesBase64(String offerType, Long offerId){
         List<String> images = new ArrayList<>();
         String uploadPath = this.getOfferUploadPath(offerType, offerId);
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         for (Blob imageBlob: blobs.getValues()) {
             String encodeBase64 = Base64.getEncoder().encodeToString(imageBlob.getContent());
             String image = "data:image/" + this.getFileNameFromPath(imageBlob.getName()) + ";base64," + encodeBase64;
@@ -194,7 +194,7 @@ public class ImageService {
     public List<String> getOfferImagesNames(String offerType, Long offerId) {
         List<String> images = new ArrayList<>();
         String uploadPath = this.getOfferUploadPath(offerType, offerId);
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         for (Blob imageBlob: blobs.getValues()) {
             images.add(this.getFileNameFromPath(imageBlob.getName()));
         }
@@ -203,7 +203,7 @@ public class ImageService {
 
     public void deleteOfferImages(String offerType, Long offerId) {
         String uploadPath = this.getOfferUploadPath(offerType, offerId);
-        Page<Blob> blobs = storage.list("traveltim-images", Storage.BlobListOption.prefix(uploadPath));
+        Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix(uploadPath));
         if (blobs.getValues().iterator().hasNext()) {
             blobs.getValues().forEach(Blob::delete);
         }
