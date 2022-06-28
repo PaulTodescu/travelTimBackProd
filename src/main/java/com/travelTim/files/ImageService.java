@@ -46,7 +46,7 @@ public class ImageService {
     }
 
     public void uploadDefaultUserImage(Long userId) {
-        String defaultImageName = "default.png";
+        String defaultImageName = "default.jpg";
         Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix("user/"));
         for (Blob blob: blobs.getValues()) {
             String fileName = this.getFileNameFromPath(blob.getName());
@@ -94,7 +94,7 @@ public class ImageService {
     }
 
     public void uploadDefaultBusinessImage(Long businessId) {
-        String defaultImageName = "default.png";
+        String defaultImageName = "default.jpg";
         Page<Blob> blobs = storage.list("traveltim-prod-images", Storage.BlobListOption.prefix("business/"));
         for (Blob blob: blobs.getValues()) {
             String fileName = this.getFileNameFromPath(blob.getName());
